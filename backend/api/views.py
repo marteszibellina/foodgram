@@ -269,25 +269,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Получение прав."""
-        # Если это GET-запрос
         if self.action in ('get', 'list', 'retrieve', 'get_link'):
-            # Доступно всем
             return (permissions.AllowAny(),)
-        # Если это POST-запрос
         elif self.action in ('create', 'post', 'patch', 'update',
                              'partial_update', 'destroy'):
-            # Доступно только автору рецепта или админу
             return (AdminOrCurrentUser(),)
-        # В остальных случаях
         return (permissions.IsAuthenticated(),)
 
     def get_serializer_class(self):
         """Получение сериализатора."""
-        # Если запрос из SAFE_METHODS: GET, HEAD, OPTIONS
         if self.request.method in permissions.SAFE_METHODS:
-            # Используем сериализатор для чтения рецептов
             return self.serializer_class
-        # В остальных случаях
         return RecipeCreateSerializer
 
     @action(methods=['get'],

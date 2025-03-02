@@ -33,7 +33,7 @@ def recipe_create(recipe, ingredients):
             RecipeIngredient(
                 ingredient=ingredient['id'],
                 recipe=recipe,
-                amount=ingredient['amount']
+                amount=ingredient['amount'],
             )
             for ingredient in ingredients]
     return RecipeIngredient.objects.bulk_create(ingredient_list)
