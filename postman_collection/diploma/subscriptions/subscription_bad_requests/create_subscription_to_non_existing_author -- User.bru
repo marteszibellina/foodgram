@@ -1,0 +1,26 @@
+meta {
+  name: create_subscription_to_non_existing_author -- User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/users/9876/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке создания подписки на несуществующего автора должен вернуться ответ со статусом 404"
+      ).to.be.eql("Not Found");
+  });
+}

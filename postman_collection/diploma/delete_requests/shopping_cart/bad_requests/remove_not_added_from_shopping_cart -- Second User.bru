@@ -1,0 +1,26 @@
+meta {
+  name: remove_not_added_from_shopping_cart -- Second User
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/shopping_cart/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на удаление из корзины рецепта, который не был туда добавлен, должен вернуть ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

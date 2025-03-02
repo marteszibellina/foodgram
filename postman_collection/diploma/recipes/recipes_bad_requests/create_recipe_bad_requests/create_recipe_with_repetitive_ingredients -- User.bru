@@ -1,0 +1,49 @@
+meta {
+  name: create_recipe_with_repetitive_ingredients -- User
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+          "id": {{firstIndredientId}},
+          "amount": 10
+      },
+      {
+          "id": {{firstIndredientId}},
+          "amount": 10
+      }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Повторяющиеся ингредиенты",
+    "text": "Двойная порция",
+    "cooking_time": 15
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если запрос на создание рецепта содержит повторяющиеся ингредиенты - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

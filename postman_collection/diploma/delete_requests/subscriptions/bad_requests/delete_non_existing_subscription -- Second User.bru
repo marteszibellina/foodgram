@@ -1,0 +1,26 @@
+meta {
+  name: delete_non_existing_subscription -- Second User
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке пользователя удалить несуществующую подписку должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

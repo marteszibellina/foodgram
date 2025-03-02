@@ -1,0 +1,45 @@
+meta {
+  name: create_recipe_with_ingredient_amount_less_than_one -- User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+    {
+        "id": {{firstIndredientId}},
+        "amount": 0
+    }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Некорректное количество ингредиента",
+    "text": "Возьмите ноль ингредиента...",
+    "cooking_time": 15
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на создание рецепта указано количество ингредиента меньше 1 - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

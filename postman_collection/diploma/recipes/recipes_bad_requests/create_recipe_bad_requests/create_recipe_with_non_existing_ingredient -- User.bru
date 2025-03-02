@@ -1,0 +1,45 @@
+meta {
+  name: create_recipe_with_non_existing_ingredient -- User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+    {
+      "id": 99999,
+      "amount": 25
+    }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Рецепт с несуществующим ингредиентом",
+    "text": "Админ, добавь ингредиент!",
+    "cooking_time": 15
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на создание рецепта указан несуществующий ингредиент - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

@@ -1,0 +1,41 @@
+meta {
+  name: update_recipe_without_tags_field -- Second User
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": 25
+      }
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Нет поля с тегами",
+    "text": "Теги не указаны",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта нет поля `tags` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

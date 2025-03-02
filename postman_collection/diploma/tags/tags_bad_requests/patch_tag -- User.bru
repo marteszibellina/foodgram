@@ -1,0 +1,34 @@
+meta {
+  name: patch_tag -- User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/tags/{{firstTagId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+      "name": "Завтрак",
+      "slug": "breakfast"
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 405", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос на обновление тега должен вернуть ответ со статус-кодом 405"
+      ).to.be.eql("Method Not Allowed");
+  });
+  
+}

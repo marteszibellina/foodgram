@@ -1,0 +1,51 @@
+meta {
+  name: check_avatar_is_deleted -- User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/users/me/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "username": {"type": "string"},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"},
+          "is_subscribed": {"type": "boolean"},
+          "avatar": {"type": ["string", "null"]}
+      },
+      "required": ["id", "username", "first_name", "last_name", "email", "is_subscribed", "avatar"],
+      "additionalProperties": false,
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  test("Поле `avatar` должно быть пустым", function () {
+      expect(
+          (responseData["avatar"] === null || responseData["avatar"] === ""), 
+          "Убедитесь, что после корректного запроса на удаление аватара в ответе на запрос к данным пользователя в поле `avatar` вернётся `null` или пустая строка"
+      ).to.be.true;
+  });
+}

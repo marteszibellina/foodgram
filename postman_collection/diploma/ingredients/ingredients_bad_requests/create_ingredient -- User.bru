@@ -1,0 +1,34 @@
+meta {
+  name: create_ingredient -- User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/ingredients/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+      "name": "Капуста квашеная",
+      "measurement_unit": "кг"
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 405", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос на создание ингредиента должен вернуть ответ со статус-кодом 405"
+      ).to.be.eql("Method Not Allowed");
+  });
+  
+}

@@ -1,0 +1,44 @@
+meta {
+  name: update_none_existing_recipe -- Second User
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/9876/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": 25
+      }
+    ],
+    "tags": [
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Обновление рецепта",
+    "text": "Проверка прав доступа.",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос пользователя на обновление несуществующего рецепта должен вернуть ответ со статусом 404"
+      ).to.be.eql("Not Found");
+  });
+}

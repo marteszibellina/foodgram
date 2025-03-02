@@ -1,0 +1,26 @@
+meta {
+  name: remove_from_favorite -- User
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/favorite/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 204", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на удаление ранее добавленного рецепта из избранного должен вернуть ответ со статус-кодом 204"
+      ).to.be.eql("No Content");
+  });
+}

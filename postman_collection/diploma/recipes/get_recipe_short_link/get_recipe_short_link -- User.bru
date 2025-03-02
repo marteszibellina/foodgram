@@ -1,0 +1,39 @@
+meta {
+  name: get_recipe_short_link -- User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/get-link/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "short-link": {"type": "string"}
+      },
+      "required": ["short-link"],
+      "additionalProperties": false,
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  
+}

@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_empty_name  -- Second User
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "",
+    "text": "Без названия",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта содержится пустое поле `name` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

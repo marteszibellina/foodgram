@@ -1,0 +1,77 @@
+meta {
+  name: get_user_list_with_limit_param -- User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/users/?limit=1
+  body: none
+  auth: apikey
+}
+
+params:query {
+  limit: 1
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties":{
+          "count": {"type": "number"},
+          "next": {"type": ["string", "null"]},
+          "previous": {"type": ["string", "null"]},
+          "results": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                      "id": {"type": "number"},
+                      "username": {"type": "string"},
+                      "first_name": {"type": "string"},
+                      "last_name": {"type": "string"},
+                      "email": {"type": "string"},
+                      "is_subscribed": {"type": "boolean"},
+                      "avatar": {"type": ["string", "null"]}
+                  },
+                  "required": ["id", "username", "first_name", "last_name", "email", "avatar"],
+                  "additionalProperties": false
+              }
+          }
+      },
+      "required": ["count", "next", "previous", "results"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+      expect(
+  //         pm.response,
+          "Убедитесь, что для запрошенного эндпоинта корректно настроена пагинация"
+      ).to.have.jsonSchema({"type": "object"});
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  test(
+      "Убедитесь, что можно изменить количество объектов на странице через параметр `limit`",
+      function () {
+  //         const limit = Number(pm.request.url.query.get("limit"));
+          const responseData = res.getBody();
+          expect(
+              responseData.results.length,
+              "Убедитесь, что с помощью параметра запроса `limit` можно изменять количество объектов на странице пагинатора"    
+          ).to.be.eql(limit)
+      }
+  );
+  
+}

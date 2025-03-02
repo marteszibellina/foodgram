@@ -1,0 +1,34 @@
+meta {
+  name: get_ingredient -- No Auth
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/ingredients/{{firstIndredientId}}/
+  body: none
+  auth: none
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "name": {"type": "string"},
+          "measurement_unit": {"type": "string"},
+      },
+      "required": ["id", "name", "measurement_unit"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

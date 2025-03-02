@@ -1,0 +1,40 @@
+meta {
+  name: create_recipe_empty_ingredients_fields -- User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Неправильный рецепт",
+    "text": "А ингредиенты я не скажу!",
+    "cooking_time": 15
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если запрос на создание рецепта содержит пустое поле `ingredients` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

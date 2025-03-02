@@ -1,0 +1,21 @@
+version: '3'
+
+volumes:  # Подключаемые тома
+  pg_data:  # Для PostgreSQL
+  static:  # Для статики
+  media:  # Для медиа-файлов (картинки)
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data  # Подключение том для данных БД
+    env_file: .env  # Подключение .env для контейнера db
+  backend:
+    build: ./backend/
+    env_file: .env
+    volumes:
+      - static:/backend/static  # Статика
+      - media:/app/media  # Медиа
+    depends_on:
+      - db

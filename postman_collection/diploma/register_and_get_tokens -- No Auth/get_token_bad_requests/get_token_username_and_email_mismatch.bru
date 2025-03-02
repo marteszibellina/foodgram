@@ -1,0 +1,27 @@
+meta {
+  name: get_token_username_and_email_mismatch
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/token/login/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": {{secondUserUsername}},
+      "password": "randomPassword"
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если запрос содержит некорректный пароль должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request")
+  });
+}

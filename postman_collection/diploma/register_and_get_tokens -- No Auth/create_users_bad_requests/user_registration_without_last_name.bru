@@ -1,0 +1,30 @@
+meta {
+  name: user_registration_without_last_name
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "username": "NoLastName",
+      "email": "no-last-name@user.ru",
+      "first_name": "NoLastName",
+      "password": {{password}}
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Убедитесь, что если в запросе на регистрацию нового пользователя не передан `last_name` - возвращается ответ со статус-кодом 400"
+      ).to.be.eql("Bad Request");
+  });
+  
+}

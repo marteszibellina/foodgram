@@ -1,0 +1,26 @@
+meta {
+  name: delete_subscription_with_non_existing_author_in_url -- Second User
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/users/9876/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке пользователя удалить подписку на несуществующего автора должен вернуться ответ со статусом 404"
+      ).to.be.eql("Not Found");
+  });
+}

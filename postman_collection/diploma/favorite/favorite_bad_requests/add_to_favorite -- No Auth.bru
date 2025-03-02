@@ -1,0 +1,20 @@
+meta {
+  name: add_to_favorite -- No Auth
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/favorite/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос неавторизованного пользователя на добавление рецепта в избранное должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

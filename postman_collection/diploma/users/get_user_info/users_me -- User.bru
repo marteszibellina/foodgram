@@ -1,0 +1,55 @@
+meta {
+  name: users_me -- User
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/users/me/
+  body: none
+  auth: apikey
+}
+
+headers {
+  ~Authorization: Token 1c9f6142fcd8d84cfd2b865cee88d20d626cd74c
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "username": {"type": "string"},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"},
+          "is_subscribed": {"type": "boolean"},
+          "avatar": {"type": ["string", "null"]}
+      },
+      "required": ["id", "username", "first_name", "last_name", "email", "is_subscribed", "avatar"],
+      "additionalProperties": false,
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  test("Поле `is_subscribed` в ответе должно иметь значение `false`", function () {
+      expect(
+          responseData.is_subscribed,
+          "Значение поля `is_subscribed` должно иметь значение `false`"
+      ).to.have.false
+  });
+}

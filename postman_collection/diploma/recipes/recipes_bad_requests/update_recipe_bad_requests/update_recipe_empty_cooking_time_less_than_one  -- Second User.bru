@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_empty_cooking_time_less_than_one  -- Second User
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Некорректное время готовки",
+    "text": "Некорректное время готовки",
+    "cooking_time": 0
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта поле `cooking_time` содержит значение меньше единицы - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

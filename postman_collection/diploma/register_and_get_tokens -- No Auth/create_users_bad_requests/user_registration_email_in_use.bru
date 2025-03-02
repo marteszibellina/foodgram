@@ -1,0 +1,30 @@
+meta {
+  name: user_registration_email_in_use
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": {{email}},
+      "username": "EmailInUse",
+      "first_name": "Email",
+      "last_name": "InUse",
+      "password": {{password}}
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если при регистрации нового пользователя в запрос передан `email` зарегистрированного пользователя - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request")
+  });
+}

@@ -1,0 +1,43 @@
+meta {
+  name: create_recipe_without_image_field -- User
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}}
+    ],
+    "name": "Надеюсь, это еда",
+    "text": "Съесть сырым",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на создание рецепта отсутствует поле `image` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

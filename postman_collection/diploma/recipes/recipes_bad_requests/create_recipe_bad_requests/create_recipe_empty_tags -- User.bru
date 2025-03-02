@@ -1,0 +1,46 @@
+meta {
+  name: create_recipe_empty_tags -- User
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      },
+      {
+        "id": {{secondIndredientId}},
+        "amount": {{secondIngredientAmount}}
+      }
+    ],
+    "tags": [],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Попробуй съесть",
+    "text": "Но будь аккуратен",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если запрос на создание рецепта содержит пустое поле `tags` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

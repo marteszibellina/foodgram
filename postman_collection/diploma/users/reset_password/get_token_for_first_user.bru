@@ -1,0 +1,44 @@
+meta {
+  name: get_token_for_first_user
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/auth/token/login/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": {{email}},
+      "password": {{password}}
+  }
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties":{
+          "auth_token": {"type": "string"},
+      },
+      "required": ["auth_token"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Убедитесь, что запроc на получение токена, содержащий корректные данные, возвращает ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа соответствует ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+      const auth_token = _.get(responseData, "auth_token");
+      if (auth_token) {
+          bru.setVar("userToken", auth_token);
+      }
+  });
+}

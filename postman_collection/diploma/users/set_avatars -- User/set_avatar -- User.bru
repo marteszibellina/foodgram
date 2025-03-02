@@ -1,0 +1,45 @@
+meta {
+  name: set_avatar -- User
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/api/users/me/avatar/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=="
+  }
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "avatar": {"type": "string"}
+      },
+      "required": ["avatar"],
+      "additionalProperties": false,
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  
+}

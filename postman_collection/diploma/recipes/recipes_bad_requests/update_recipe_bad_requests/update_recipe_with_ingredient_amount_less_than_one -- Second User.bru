@@ -1,0 +1,46 @@
+meta {
+  name: update_recipe_with_ingredient_amount_less_than_one -- Second User
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+    {
+        "id": {{firstIndredientId}},
+        "amount": 0
+    }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Рецепт с некорректным количеством ингридиента",
+    "text": "Проверка валидации количества ингредиента",
+    "cooking_time": 15
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта количество ингредиентов меньше 1 - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+  
+}

@@ -1,0 +1,27 @@
+meta {
+  name: logout -- User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/token/logout/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 204", function () {
+      expect(
+  //         pm.response.status,
+          "Убедитесь, что запрос зарегистрированного пользователя на удаление токена возвращает статус 204"
+      ).to.be.eql("No Content");
+  });
+  
+}

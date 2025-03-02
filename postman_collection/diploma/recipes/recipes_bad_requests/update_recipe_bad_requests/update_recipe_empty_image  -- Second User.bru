@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_empty_image  -- Second User
+  type: http
+  seq: 12
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}}
+    ],
+    "image": "",
+    "name": "Рецепт без картинки",
+    "text": "Картина не приложена",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта содержится пустое поле `image` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

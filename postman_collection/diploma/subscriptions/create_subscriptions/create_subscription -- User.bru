@@ -1,0 +1,62 @@
+meta {
+  name: create_subscription -- User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "username": {"type": "string"},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"},
+          "is_subscribed": {"type": "boolean"},
+          "avatar": {"type": ["string", "null"]},
+          "recipes_count": {"type": "number"},
+          "recipes": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                      "id": {"type": "number"},
+                      "name": {"type": "string"},
+                      "image": {"type": "string"},
+                      "cooking_time": {"type": "number"}
+                  },
+                  "required": ["id", "name", "image", "cooking_time"],
+                  "additionalProperties": false
+              }
+          }
+      },
+      "required": [
+          "id", "username", "first_name", "last_name", "email",
+          "is_subscribed", "recipes", "recipes_count", "avatar"
+      ],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 201", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на создание подписки должен вернуть ответ со статус-кодом 201"
+      ).to.be.eql("Created");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

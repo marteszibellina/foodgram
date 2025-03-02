@@ -1,0 +1,20 @@
+meta {
+  name: create_subscription -- No Auth
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя на создание подписки должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

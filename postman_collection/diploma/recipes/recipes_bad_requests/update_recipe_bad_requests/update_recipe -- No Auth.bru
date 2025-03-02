@@ -1,0 +1,38 @@
+meta {
+  name: update_recipe -- No Auth
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": 25
+      }
+    ],
+    "tags": [
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Обновление рецепта",
+    "text": "Проверка прав доступа.",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя на обновление рецепта должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

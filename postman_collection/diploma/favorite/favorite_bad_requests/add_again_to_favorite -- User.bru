@@ -1,0 +1,26 @@
+meta {
+  name: add_again_to_favorite -- User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/favorite/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке повторно добавить рецепт в избранное должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

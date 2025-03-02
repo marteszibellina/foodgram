@@ -1,0 +1,35 @@
+meta {
+  name: get_tag_detail -- No Auth
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/tags/{{firstTagId}}/
+  body: none
+  auth: none
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "name": {"type": "string"},
+          "slug": {"type": "string"},
+      },
+      "required": ["id", "name", "slug"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

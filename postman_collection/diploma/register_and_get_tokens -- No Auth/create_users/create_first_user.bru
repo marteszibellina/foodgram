@@ -1,0 +1,51 @@
+meta {
+  name: create_first_user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": {{email}},
+      "username": {{username}},
+      "first_name": "Вася",
+      "last_name": "Иванов",
+      "password": {{password}}
+  }
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties":{
+          "id": {"type": "number"},
+          "username": {"type": "string"},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"}
+      },
+      "required": ["id", "username", "first_name", "last_name", "email"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 201", function () {
+      expect(
+  //         pm.response.status,
+          "Убедитесь, что запроc на регистрацию нового пользователя, содержащий корректные данные, возвращает ответ со статус-кодом 201"
+      ).to.be.eql("Created");
+      const userId = _.get(responseData, "id");
+      if (userId) {
+          bru.setVar("userId", userId);
+      }
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

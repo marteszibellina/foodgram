@@ -1,0 +1,30 @@
+meta {
+  name: user_registration_with_invalid_username
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "username": "InvalidU$ername",
+      "email": "invalid-username@user.ru",
+      "first_name": "Invalid",
+      "last_name": "Username",
+      "password": {{password}}
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Для поля `username` не должны приниматься значения, не соответствующие регулярному выражению `^[\w.@+-]+\Z`"
+      ).to.be.eql("Bad Request")
+  });
+}

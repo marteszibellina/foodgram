@@ -1,0 +1,55 @@
+meta {
+  name: get_tag_list -- User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/tags/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "array",
+      "items": {
+          "type": "object",
+          "properties": {
+              "id": {"type": "number"},
+              "name": {"type": "string"},
+  
+              "slug": {"type": "string"},
+          },
+          "required": ["id", "name", "slug"],
+          "additionalProperties": false
+      }
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+      expect(
+          responseData.length >= 3,
+          "Создайте как минимум 3 тега для корректной работы коллекции запросов"
+      ).to.be.true;
+      bru.setVar("firstTagId", responseData[0].id);
+      bru.setVar('firstTagSlug', responseData[0].slug);
+      bru.setVar("secondTagId", responseData[1].id);
+      bru.setVar('secondTagSlug', responseData[1].slug);
+      bru.setVar("thirdTagId", responseData[2].id);
+      bru.setVar('thirdTagSlug', responseData[2].slug);
+  });
+}

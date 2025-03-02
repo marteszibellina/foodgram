@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_with_non_existing_tag -- Second User
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": 25
+      }
+    ],
+    "tags": [
+        9876
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Несуществующий тег",
+    "text": "Несуществующие тег",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта указан несуществующий тег - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

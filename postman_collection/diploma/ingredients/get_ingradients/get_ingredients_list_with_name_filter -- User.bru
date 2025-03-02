@@ -1,0 +1,59 @@
+meta {
+  name: get_ingredients_list_with_name_filter -- User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/ingredients/?name={{ingredientNameFirstLatter}}
+  body: none
+  auth: apikey
+}
+
+params:query {
+  name: {{ingredientNameFirstLatter}}
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "array",
+      "items": {
+          "type": "object",
+          "properties": {
+              "id": {"type": "number"},
+              "name": {"type": "string"},
+              "measurement_unit": {"type": "string"},
+          },
+          "required": ["id", "name", "measurement_unit"],
+          "additionalProperties": false
+      }
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  test(
+      "Ответ должен содержать данные, удовлетворяющие условиям поиска",
+      function () {
+          const assert_msg = "Ответ должен содержать ингредиенты, начало названия которых совпадает со значением квери-параметра `name`"
+          expect(responseData.length > 0, assert_msg);
+  //         const expectedingredientNameStart = decodeURIComponent(pm.request.url.query.get("name"));
+          for (elem of responseData) {
+              expect(elem.name.startsWith(expectedingredientNameStart), assert_msg).to.be.true;
+          };
+  });
+  
+}

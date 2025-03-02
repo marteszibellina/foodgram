@@ -1,0 +1,27 @@
+meta {
+  name: set_avatar -- No Auth
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/users/me/avatar/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=="
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя должен вернуть ответ со статус-кодом 401"
+      ).to.be.eql("Unauthorized");
+  });
+  
+}

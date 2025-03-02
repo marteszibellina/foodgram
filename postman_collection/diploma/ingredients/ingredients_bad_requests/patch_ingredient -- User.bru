@@ -1,0 +1,34 @@
+meta {
+  name: patch_ingredient -- User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/ingredients/{{firstIndredientId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+      "name": "Капуста",
+      "measurement_unit": "кг"
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 405", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос на обновление ингредиента должен вернуть ответ со статус-кодом 405"
+      ).to.be.eql("Method Not Allowed");
+  });
+  
+}

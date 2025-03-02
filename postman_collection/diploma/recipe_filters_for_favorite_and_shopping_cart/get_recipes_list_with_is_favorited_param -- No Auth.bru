@@ -1,0 +1,105 @@
+meta {
+  name: get_recipes_list_with_is_favorited_param -- No Auth
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/recipes/?is_favorited=1
+  body: none
+  auth: none
+}
+
+params:query {
+  is_favorited: 1
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "required": ["count", "next", "previous", "results"],
+      "additionalProperties": false,
+      "properties": {
+          "count": {"type": "number"},
+          "next": {"type": ["string", "null"]},
+          "previous": {"type": ["string", "null"]},
+          "results": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties":{
+                      "id": {"type": "number"},
+                      "tags": {
+                          "type": "array",
+                          "items": {
+                              "type": "object",
+                              "properties": {
+                                  "id": {"type": "number"},
+                                  "name": {"type": "string"},
+                                  "slug": {"type": "string"},
+                              },
+                              "required": ["id", "name", "slug"],
+                              "additionalProperties": false
+                          }
+                      },
+                      "author": {
+                          "type": "object",
+                          "properties": {
+                              "id": {"type": "number"},
+                              "username": {"type": "string"},
+                              "first_name": {"type": "string"},
+                              "last_name": {"type": "string"},
+                              "email": {"type": "string"},
+                              "is_subscribed": {"type": "boolean"},
+                              "avatar": {"type": ["string", "null"]}
+                          },
+                          "required": ["id", "username", "first_name", "last_name", "email", "is_subscribed", "avatar"],
+                          "additionalProperties": false
+                      },
+                      "ingredients": {
+                          "type": "array",
+                          "items": {
+                              "type": "object",
+                              "properties": {
+                                  "id": {"type": "number"},
+                                  "name": {"type": "string"},
+                                  "measurement_unit": {"type": "string"},
+                                  "amount": {"type": "number"}
+                              },
+                              "required": ["id", "name", "measurement_unit", "amount"],
+                              "additionalProperties": false
+                          }
+                      },
+                      "is_favorited": {"type": "boolean"},
+                      "is_in_shopping_cart": {"type": "boolean"},
+                      "name": {"type": "string"},
+                      "image": {"type": "string"},
+                      "text": {"type": "string"},
+                      "cooking_time": {"type": "number"}
+                  },
+                  "required": [
+                      "id", "tags", "author", "ingredients", "is_favorited", "is_in_shopping_cart",
+                      "name", "image", "text", "cooking_time"
+                  ],
+                  "additionalProperties": false
+              }
+          }
+          
+      }
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос с параметром `is_favorited`, отправленный незарегистрированным пользователем, должен вернуть ответ со статусом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+      expect(
+  //         pm.response,
+          "Убедитесь, что для запрошенного эндпоинта корректно настроена пагинация"
+      ).to.have.jsonSchema({"type": "object"});
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+  
+}

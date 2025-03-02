@@ -1,0 +1,27 @@
+meta {
+  name: get_non_existing_profile -- User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/users/9876/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос к `/api/users/{userId}/` с `id` несуществующего пользователя должен вернуть ответ со статус-кодом 404"
+      ).to.be.eql("Not Found");
+  });
+  
+}

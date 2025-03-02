@@ -1,0 +1,43 @@
+meta {
+  name: create_recipe -- No Auth
+  type: http
+  seq: 20
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      },
+      {
+        "id": {{secondIndredientId}},
+        "amount": {{secondIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Рецепт неавторизованного пользователя",
+    "text": "Рецепт неавторизованного пользователя",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя на создание рецепта должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

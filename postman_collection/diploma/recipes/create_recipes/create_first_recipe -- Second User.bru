@@ -1,0 +1,116 @@
+meta {
+  name: create_first_recipe -- Second User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      },
+      {
+        "id": {{secondIndredientId}},
+        "amount": {{secondIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Нечто съедобное (это не точно)",
+    "text": "Приготовьте как нибудь эти ингредиеты",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "object",
+      "properties":{
+          "id": {"type": "number"},
+          "tags": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                      "id": {"type": "number"},
+                      "name": {"type": "string"},
+                      "slug": {"type": "string"},
+                  },
+                  "required": ["id", "name", "slug"],
+                  "additionalProperties": false
+              }
+          },
+          "author": {
+              "type": "object",
+              "properties": {
+                  "id": {"type": "number"},
+                  "username": {"type": "string"},
+                  "first_name": {"type": "string"},
+                  "last_name": {"type": "string"},
+                  "email": {"type": "string"},
+                  "is_subscribed": {"type": "boolean"},
+                  "avatar": {"type": ["string", "null"]}
+              },
+              "required": ["id", "username", "first_name", "last_name", "email", "is_subscribed", "avatar"],
+              "additionalProperties": false
+          },
+          "ingredients": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                      "id": {"type": "number"},
+                      "name": {"type": "string"},
+                      "measurement_unit": {"type": "string"},
+                      "amount": {"type": "number"}
+                  },
+                  "required": ["id", "name", "measurement_unit", "amount"],
+                  "additionalProperties": false
+              }
+          },
+          "is_favorited": {"type": "boolean"},
+          "is_in_shopping_cart": {"type": "boolean"},
+          "name": {"type": "string"},
+          "image": {"type": "string"},
+          "text": {"type": "string"},
+          "cooking_time": {"type": "number"}
+      },
+      "required": [
+          "id", "tags", "author", "ingredients", "is_favorited", "is_in_shopping_cart",
+          "name", "image", "text", "cooking_time"
+      ],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 201", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на создание рецепта, содержащий корректные данные, должен вернуть ответ со статус-кодом 201"
+      ).to.be.eql("Created");
+      const recipeId = _.get(responseData, "id");
+      if (recipeId) {
+          bru.setVar("firstRecipeId", recipeId);
+      }
+  });
+  test('Структура ответа должна соответстовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

@@ -1,0 +1,45 @@
+meta {
+  name: delete_recipe_not_by_author -- Second User
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/{{fifthRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": 1123,
+        "amount": 10
+      }
+    ],
+    "tags": [
+      1,
+      2
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "string",
+    "text": "string",
+    "cooking_time": 1
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 403", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос пользователя на удаление чужого рецепта должен вернуть ответ со статусом 403"
+      ).to.be.eql("Forbidden");
+  });
+}

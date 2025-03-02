@@ -1,0 +1,26 @@
+meta {
+  name: delete_first_subscription -- User
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 204", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на удаление существующей подписки должен вернуть ответ со статус-кодом 204"
+      ).to.be.eql("No Content");
+  });
+}

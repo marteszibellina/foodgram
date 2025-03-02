@@ -1,0 +1,45 @@
+meta {
+  name: update_recipe_repetitive_tags  -- Second User
+  type: http
+  seq: 11
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}},
+      {{firstTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Повторяющиеся теги (обновление)",
+    "text": "Проверка валидации",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если запрос автора на обновление рецепта содержит повторяющиеся теги - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

@@ -1,0 +1,44 @@
+meta {
+  name: create_recipe_empty_image -- User
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      }
+    ],
+    "tags": [
+      {{firstTagId}}
+    ],
+    "image": "",
+    "name": "А фотку я не покажу",
+    "text": "Приготовить любым способом",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на создание рецепта содержится пустое поле `image` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

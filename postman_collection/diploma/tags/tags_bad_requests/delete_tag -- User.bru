@@ -1,0 +1,27 @@
+meta {
+  name: delete_tag -- User
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/tags/{{firstTagId}}/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 405", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос на удаление тега должен вернуть ответ со статус-кодом 405"
+      ).to.be.eql("Method Not Allowed");
+  });
+  
+}

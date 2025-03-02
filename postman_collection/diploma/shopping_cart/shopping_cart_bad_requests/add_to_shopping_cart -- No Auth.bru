@@ -1,0 +1,20 @@
+meta {
+  name: add_to_shopping_cart -- No Auth
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/shopping_cart/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос неавторизованного пользователя не добавление рецепта в корзину должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

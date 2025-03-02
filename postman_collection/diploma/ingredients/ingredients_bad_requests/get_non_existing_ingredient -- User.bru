@@ -1,0 +1,27 @@
+meta {
+  name: get_non_existing_ingredient -- User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/ingredients/9876/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос запрос к `/api/ingredients/{ingredientId}/`, содержащий `id` несуществующего ингредиента, должен вернуть ответ со статус-кодом 404"
+      ).to.be.eql("Not Found");
+  });
+  
+}

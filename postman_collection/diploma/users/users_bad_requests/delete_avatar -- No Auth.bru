@@ -1,0 +1,21 @@
+meta {
+  name: delete_avatar -- No Auth
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/users/me/avatar/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя должен вернуть ответ со статус-кодом 401"
+      ).to.be.eql("Unauthorized");
+  });
+  
+}

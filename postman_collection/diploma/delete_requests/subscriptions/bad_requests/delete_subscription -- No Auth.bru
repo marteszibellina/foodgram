@@ -1,0 +1,20 @@
+meta {
+  name: delete_subscription -- No Auth
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос неавторизованного пользователя на удаление подписки должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

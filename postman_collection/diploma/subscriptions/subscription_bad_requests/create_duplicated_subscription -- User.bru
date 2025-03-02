@@ -1,0 +1,26 @@
+meta {
+  name: create_duplicated_subscription -- User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/users/{{thirdUserId}}/subscribe/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке создания дублирующейся подписки должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

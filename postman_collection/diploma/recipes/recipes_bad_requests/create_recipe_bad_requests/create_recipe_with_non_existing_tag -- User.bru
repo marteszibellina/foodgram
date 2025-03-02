@@ -1,0 +1,48 @@
+meta {
+  name: create_recipe_with_non_existing_tag -- User
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/recipes/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": {{firstIngredientAmount}}
+      },
+      {
+        "id": {{secondIndredientId}},
+        "amount": {{secondIngredientAmount}}
+      }
+    ],
+    "tags": [
+        9876
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Рецепт с несуществующим тегом",
+    "text": "Тега нет, а хотелось бы",
+    "cooking_time": 5
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на создание рецепта указан несуществующий тег - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

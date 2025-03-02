@@ -1,0 +1,30 @@
+meta {
+  name: user_registration_too_long_last_name
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "username": "TooLongLastName",
+      "email": "too-long-last-name@user.ru",
+      "first_name": "TooLongLastName",
+      "last_name": "{{tooLongUsername}}",
+      "password": {{password}}
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Максимальная длина поля`last_name` должна иметь ограничение в 150 символов"
+      ).to.be.eql("Bad Request")
+  });
+}

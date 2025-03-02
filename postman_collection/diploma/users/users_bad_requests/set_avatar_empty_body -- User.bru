@@ -1,0 +1,30 @@
+meta {
+  name: set_avatar_empty_body -- User
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/users/me/avatar/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {}
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе на добавление аватара отсутствует поле `avatar` - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

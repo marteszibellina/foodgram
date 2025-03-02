@@ -1,0 +1,27 @@
+meta {
+  name: download_shopping_cart -- User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/recipes/download_shopping_cart/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя на скачивание списка покупок должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  
+}

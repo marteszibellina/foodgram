@@ -1,0 +1,38 @@
+meta {
+  name: get_profile -- No Auth
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/users/{{userId}}/
+  body: none
+  auth: none
+}
+
+tests {
+  const responseSchema = {
+      "type": "object",
+      "properties": {
+          "id": {"type": "number"},
+          "username": {"type": "string"},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "email": {"type": "string"},
+          "is_subscribed": {"type": "boolean"},
+          "avatar": {"type": ["string", "null"]}
+      },
+      "required": ["id", "username", "first_name", "last_name", "email", "is_subscribed", "avatar"],
+      "additionalProperties": false
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос незарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+  });
+}

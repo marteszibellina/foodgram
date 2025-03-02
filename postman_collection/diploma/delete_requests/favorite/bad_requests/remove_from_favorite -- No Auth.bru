@@ -1,0 +1,20 @@
+meta {
+  name: remove_from_favorite -- No Auth
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/{{firstRecipeId}}/favorite/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Статус-код ответа должен быть 401", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос неавторизованного пользователя на удаление рецепта из избранного должен вернуть ответ со статусом 401"
+      ).to.be.eql("Unauthorized");
+  });
+}

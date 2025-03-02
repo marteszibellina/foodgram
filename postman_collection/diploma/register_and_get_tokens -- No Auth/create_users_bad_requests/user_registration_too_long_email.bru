@@ -1,0 +1,30 @@
+meta {
+  name: user_registration_too_long_email
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/users/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "username": "TooLongEmail",
+      "email": "{{tooLongEmail}}",
+      "first_name": "TooLongEmail",
+      "last_name": "TooLongEmail",
+      "password": {{password}}
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Максимальная длина поля `email` должна иметь ограничение в 254 символа"
+      ).to.be.eql("Bad Request")
+  });
+}

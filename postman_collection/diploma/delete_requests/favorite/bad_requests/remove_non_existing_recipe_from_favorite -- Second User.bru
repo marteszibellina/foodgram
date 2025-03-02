@@ -1,0 +1,26 @@
+meta {
+  name: remove_non_existing_recipe_from_favorite -- Second User
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/9876/favorite/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+tests {
+  test("Статус-код ответа должен быть 404", function () {
+      expect(
+  //         pm.response.status,
+          "При попытке пользователя удалить несуществующий рецепт из избранного должен вернуться ответ со статусом 404"
+      ).to.be.eql("Not Found");
+  });
+}

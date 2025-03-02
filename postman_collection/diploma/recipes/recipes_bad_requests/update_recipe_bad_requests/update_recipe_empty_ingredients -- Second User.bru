@@ -1,0 +1,39 @@
+meta {
+  name: update_recipe_empty_ingredients -- Second User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [],
+    "tags": [
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Пустое поле ингредиентов",
+    "text": "Ингредиенты не указаны",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос автора на обновление рецепта с пустым полем `ingredients` - должен вернуть ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}

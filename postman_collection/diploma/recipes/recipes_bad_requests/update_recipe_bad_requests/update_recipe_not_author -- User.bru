@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_not_author -- User
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": {{firstIndredientId}},
+        "amount": 25
+      }
+    ],
+    "tags": [
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Обновление чужого рецепта",
+    "text": "Проверка прав доступа.",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 403", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос пользователя на обновление чужого рецепта должен вернуть ответ со статусом 403"
+      ).to.be.eql("Forbidden");
+  });
+}

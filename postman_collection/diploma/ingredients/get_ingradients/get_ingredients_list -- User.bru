@@ -1,0 +1,51 @@
+meta {
+  name: get_ingredients_list -- User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/ingredients/
+  body: none
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{userToken}}
+  placement: header
+}
+
+tests {
+  const responseData = res.getBody();
+  const responseSchema = {
+      "type": "array",
+      "items": {
+          "type": "object",
+          "properties": {
+              "id": {"type": "number"},
+              "name": {"type": "string"},
+              "measurement_unit": {"type": "string"},
+          },
+          "required": ["id", "name", "measurement_unit"],
+          "additionalProperties": false
+      }
+  };
+  
+  test("Статус-код ответа должен быть 200", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос зарегистрированного пользователя должен вернуть ответ со статус-кодом 200"
+      ).to.be.eql("OK");
+  });
+  test('Структура ответа должна соответствовать ожидаемой', function () {
+  //     pm.response.to.have.jsonSchema(responseSchema);
+      expect(
+          responseData.length >= 2,
+          "Создайте в БД как минимум два ингредиента для корректной работы коллекции запросов"
+      )
+      bru.setVar("firstIndredientId", responseData[0].id);
+      bru.setVar('ingredientNameFirstLatter', responseData[0].name.slice(0,1))
+      bru.setVar("secondIndredientId", responseData[1].id);
+  });
+}

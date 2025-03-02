@@ -1,0 +1,45 @@
+meta {
+  name: delete_second_recipe -- Second User
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+        "id": 1123,
+        "amount": 10
+      }
+    ],
+    "tags": [
+      1,
+      2
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "string",
+    "text": "string",
+    "cooking_time": 1
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 204", function () {
+      expect(
+  //         pm.response.status,
+          "Запрос автора на удаление собственного рецепта должен вернуть ответ со статус-кодом 204"
+      ).to.be.eql("No Content");
+  });
+}

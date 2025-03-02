@@ -1,0 +1,44 @@
+meta {
+  name: update_recipe_with_non_existing_ingredient -- Second User
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/recipes/{{secondRecipeId}}/
+  body: json
+  auth: apikey
+}
+
+auth:apikey {
+  key: Authorization
+  value: Token {{secondUserToken}}
+  placement: header
+}
+
+body:json {
+  {
+    "ingredients": [
+      {
+          "id": 99999,
+          "amount": 20
+      }
+    ],
+    "tags": [
+      {{secondTagId}}
+    ],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "name": "Пустое поле ингредиентов",
+    "text": "Ингредиенты не указаны",
+    "cooking_time": 12
+  }
+}
+
+tests {
+  test("Статус-код ответа должен быть 400", function () {
+      expect(
+  //         pm.response.status,
+          "Если в запросе автора на обновление рецепта указан несуществующий ингредиент - должен вернуться ответ со статусом 400"
+      ).to.be.eql("Bad Request");
+  });
+}
