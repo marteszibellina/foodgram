@@ -194,25 +194,27 @@ class UserViewSet(UVS):
     def subscribe(self, request, id):
         """Подписка на пользователя."""
         author = get_object_or_404(User, id=id)
+        user = request.user
         recipes_limit = int(request.query_params.get('recipes_limit', 3))
         if request.method == 'POST':
+            
             if Subscriptions.objects.filter(
-                user=request.user,
+                user=user,
                 author=author
             ).exists():
                 return Response(
-                    {'errors': 'Вы уже подписаны'},
+                    {'errors': 'Вы уже подписаны на этого автора'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            if author == request.user:
+            if author == user:
                 return Response(
                     {'errors': 'Нельзя подписаться на самого себя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             subscription = Subscriptions.objects.create(
-                user=request.user,
+                user=user,
                 author=author
             )
             serializer = SubscribeSerializer(
@@ -223,10 +225,11 @@ class UserViewSet(UVS):
 
         get_object_or_404(
             Subscriptions,
-            user=request.user,
+            user=user,
             author=author
         ).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Подписка удалена'},
+                        status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False,
             methods=['get'],

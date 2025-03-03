@@ -199,25 +199,38 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeViewSerializer(serializers.ModelSerializer):
-    """Сериализатор для просмотра рецепта."""
+    """Сериализатор просмотра рецепта."""
+
+    author = UserViewSerializer(
+        read_only=True,
+    )
+    tags = TagSerializer(
+        read_only=True,
+        many=True,
+    )
+    ingredients = RecipeIngredientViewSerializer(
+        read_only=True,
+        many=True,
+        source='recipe_ingredients',
+    )
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         """Мета-класс сериализатора."""
+
         model = Recipe
-        fields = (
-            'id',
-            'name',
-            'cooking_time',
-            'image',
-        )
+        exclude = ('pub_date',)  # Всё, кроме даты публикации
 
     def get_is_favorited(self, obj):
         """Проверка на наличие в избранном."""
-        return check_favorite_in_list(self.context.get('request'), obj, Favorite)
+        request = self.context.get('request')
+        return check_favorite_in_list(request, obj, Favorite)
 
     def get_is_in_shopping_cart(self, obj):
-        """Проверка на наличие в корзине."""
-        return check_favorite_in_list(self.context.get('request'), obj, ShoppingCart)
+        """Проверка на наличие в списке покупок."""
+        request = self.context.get('request')
+        return check_favorite_in_list(request, obj, ShoppingCart)
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -345,6 +358,28 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return RecipeViewSerializer(instance, context=self.context).data
 
 
+class RecipeViewSubscriptionSerializer(serializers.ModelSerializer):
+    """Сериализатор для просмотра рецепта."""
+
+    class Meta:
+        """Мета-класс сериализатора."""
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'cooking_time',
+            'image',
+        )
+
+    def get_is_favorited(self, obj):
+        """Проверка на наличие в избранном."""
+        return check_favorite_in_list(self.context.get('request'), obj, Favorite)
+
+    def get_is_in_shopping_cart(self, obj):
+        """Проверка на наличие в корзине."""
+        return check_favorite_in_list(self.context.get('request'), obj, ShoppingCart)
+
+
 class SubscribeRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор рецепта для подписки."""
 
@@ -393,11 +428,12 @@ class SubscribeSerializer(serializers.ModelSerializer):
             return True
         return False
 
+
     def get_recipes(self, obj):
         """Получение рецептов автора с учетом лимита."""
         recipes_limit = self.context.get('recipes_limit')
         recipes = obj.author.recipes.all()[:recipes_limit]
-        return RecipeViewSerializer(recipes, many=True, context=self.context).data
+        return RecipeViewSubscriptionSerializer(recipes, many=True, context=self.context).data
 
     def get_recipes_count(self, obj):
         """Получение количества рецептов автора."""
