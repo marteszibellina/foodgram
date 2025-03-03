@@ -91,21 +91,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class FavoriteViewSet(viewsets.ModelViewSet):
-    """Вьюсет для избранных рецептов."""
-
-    queryset = Favorite.objects.all()
-    serializer_class = RecipeViewSerializer
-    # Доступно только для авторизованного пользователя
-    permission_class = (permissions.IsAuthenticated,)
-    # Пагинация не требуется
-    pagination_class = None
-
-    def get_queryset(self):
-        """Получение списка избранных рецептов."""
-        return Favorite.objects.filter(user=self.request.user)
-
-
 class UserViewSet(UVS):
     """Вьюсет для пользователей."""
 
@@ -193,23 +178,22 @@ class UserViewSet(UVS):
             pagination_class=CustomPagination)
     def subscribe(self, request, id):
         """Подписка на пользователя."""
-        author = get_object_or_404(User, id=id)
         user = request.user
         recipes_limit = int(request.query_params.get('recipes_limit', 3))
         if request.method == 'POST':
-            
+            author = get_object_or_404(User, id=id)
             if Subscriptions.objects.filter(
                 user=user,
                 author=author
             ).exists():
                 return Response(
-                    {'errors': 'Вы уже подписаны на этого автора'},
+                    {'detail': 'Вы уже подписаны на этого автора'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             if author == user:
                 return Response(
-                    {'errors': 'Нельзя подписаться на самого себя'},
+                    {'detail': 'Нельзя подписаться на самого себя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -223,13 +207,18 @@ class UserViewSet(UVS):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        get_object_or_404(
-            Subscriptions,
-            user=user,
-            author=author
-        ).delete()
-        return Response({'detail': 'Подписка удалена'},
-                        status=status.HTTP_204_NO_CONTENT)
+        if request.method == 'DELETE':
+            author = self.get_object()
+            try:
+                Subscriptions.objects.get(user=user, author=author)
+            except Subscriptions.DoesNotExist:
+                return Response(
+                    {'detail': 'Такого автора не существует'},
+                    status=status.HTTP_400_BAD_REQUEST)
+            Subscriptions.objects.filter(user=user, author=author).delete()
+            return Response(
+                {'detail': 'Вы отписались от этого автора'},
+                status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False,
             methods=['get'],
@@ -255,7 +244,6 @@ class UserViewSet(UVS):
             context={'request': request, 'recipes_limit': recipes_limit}
         )
         return self.get_paginated_response(serializer.data)
-
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -331,10 +319,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             shopping_cart = serializer.save(user=request.user)
             recipe_serializer = RecipeShortSerializer(recipe)
-            return Response({
-                'user': serializer.data['user'],
-                'recipe': recipe_serializer.data},
-                status=status.HTTP_201_CREATED)
+            return Response(recipe_serializer.data,
+                            status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             shopping_cart = ShoppingCart.objects.filter(
                 user=request.user,
@@ -396,9 +382,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'image': recipe.image.url if recipe.image else None,
                 'cooking_time': recipe.cooking_time
             }
-            return Response({
-                'recipe': recipe_data
-            }, status=status.HTTP_201_CREATED)
+            return Response(recipe_data, status=status.HTTP_201_CREATED)
         # В случае DELETE — удаляем рецепт из избранного
         if request.method == 'DELETE':
             favorite = Favorite.objects.filter(user=request.user, recipe=recipe).first()
@@ -436,6 +420,7 @@ class SubscribeViewSet(viewsets.ModelViewSet):
             return (permissions.AllowAny(),)
         return super().get_permissions()
 
+
 class ShoppingCartViewSet(viewsets.ModelViewSet):
     """Вьюсет для списка покупок."""
 
@@ -449,3 +434,18 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Получение списка покупок."""
         return ShoppingCart.objects.filter(user=self.request.user)
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    """Вьюсет для избранных рецептов."""
+
+    queryset = Favorite.objects.all()
+    serializer_class = RecipeViewSerializer
+    # Доступно только для авторизованного пользователя
+    permission_class = (permissions.IsAuthenticated,)
+    # Пагинация не требуется
+    pagination_class = None
+
+    def get_queryset(self):
+        """Получение списка избранных рецептов."""
+        return Favorite.objects.filter(user=self.request.user)

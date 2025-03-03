@@ -428,7 +428,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
             return True
         return False
 
-
     def get_recipes(self, obj):
         """Получение рецептов автора с учетом лимита."""
         recipes_limit = self.context.get('recipes_limit')
