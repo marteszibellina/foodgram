@@ -29,7 +29,6 @@ from api.serializers import (TagSerializer,
                              UserPasswordSerializer,
                              UserAvatarSerializer,
                              SubscribeSerializer,
-                             SubscribeViewSerializer,
                              RecipeShortSerializer,
                              FavoriteSerializer,
                              )
@@ -194,56 +193,73 @@ class UserViewSet(UVS):
             pagination_class=CustomPagination)
     def subscribe(self, request, id):
         """Подписка на пользователя."""
-        author = self.get_object()
-        user = request.user
+        author = get_object_or_404(User, id=id)
+        recipes_limit = int(request.query_params.get('recipes_limit', 3))
         if request.method == 'POST':
-            serializer = SubscribeSerializer(author,
-                                             context={'request': request})
-            try:
-                serialized_data, created = serializer.subscribe(user)
-                if created:
-                    return Response(serialized_data,
-                                    status=status.HTTP_201_CREATED)
-                else:
-                    return Response(serialized_data,
-                                    status=status.HTTP_400_BAD_REQUEST)
-            except serializers.ValidationError as e:
-                return Response({"detail": str(e)},
-                                status=status.HTTP_400_BAD_REQUEST)
-        if request.method == 'DELETE':
-            try:
-                Subscriptions.objects.get(user=user, author=author)
-            except Subscriptions.DoesNotExist:
+            if Subscriptions.objects.filter(
+                user=request.user,
+                author=author
+            ).exists():
                 return Response(
-                    {"detail": "Вы не подписаны на этого автора"},
-                    status=status.HTTP_400_BAD_REQUEST)
-            Subscriptions.objects.filter(user=user, author=author).delete()
-            return Response(
-                {"detail": "Вы отписались от этого автора"},
-                status=status.HTTP_204_NO_CONTENT)
+                    {'errors': 'Вы уже подписаны'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if author == request.user:
+                return Response(
+                    {'errors': 'Нельзя подписаться на самого себя'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            subscription = Subscriptions.objects.create(
+                user=request.user,
+                author=author
+            )
+            serializer = SubscribeSerializer(
+                subscription,
+                context={'request': request, 'recipes_limit': recipes_limit}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        get_object_or_404(
+            Subscriptions,
+            user=request.user,
+            author=author
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False,
             methods=['get'],
             url_path='subscriptions',
             permission_classes=[permissions.IsAuthenticated],
-            serializer_class=SubscribeViewSerializer,
             pagination_class=CustomPagination)
     def subscriptions(self, request):
         """Получение списка подписок."""
-        user = request.user
-        queryset = Subscriptions.objects.filter(user=user)
+        recipes_limit = int(request.query_params.get('recipes_limit', 3))
+
+        queryset = (
+            Subscriptions.objects.filter(user=request.user)
+            .select_related('author')
+            .prefetch_related('author__recipes')
+            .order_by('-id')
+        )
+
         pages = self.paginate_queryset(queryset)
-        serializer = SubscribeViewSerializer(
-            pages, many=True,
-            context={'request': request})
+
+        serializer = SubscribeSerializer(
+            pages,
+            many=True,
+            context={'request': request, 'recipes_limit': recipes_limit}
+        )
         return self.get_paginated_response(serializer.data)
+
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами."""
 
     # Используем сериализатор создания рецептов по умолчанию
-    serializer_class = RecipeViewSerializer
+    serializer_class = RecipeCreateSerializer
     # Используем фильтры для рецептов
     filterset_class = RecipeFilter
     pagination_class = CustomPagination

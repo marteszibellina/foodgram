@@ -15,8 +15,8 @@ from users.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
                              FIRST_NAME_MAX_LENGTH, LAST_NAME_MAX_LENGTH,
                              PASSWORD_MAX_LENGTH,)
 from users.validators import (validate_username,
-                              validate_password,)
-                            #   selfsubscribe)
+                              validate_password,
+                              selfsubscribe)
 
 
 class User(AbstractUser):
@@ -108,7 +108,7 @@ class Subscriptions(models.Model):
         related_name='following',
         verbose_name='Автор рецептов',
         # НАСТРОИТЬ
-        # validators=[selfsubscribe],
+        validators=[selfsubscribe],
     )
 
     class Meta:

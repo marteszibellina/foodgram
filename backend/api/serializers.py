@@ -201,16 +201,15 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 class RecipeViewSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра рецепта."""
 
-    author = UserViewSerializer(read_only=True)
-    tags = TagSerializer(read_only=True, many=True)
-    ingredients = RecipeIngredientViewSerializer(read_only=True, many=True, source='recipe_ingredients')
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
-
     class Meta:
         """Мета-класс сериализатора."""
         model = Recipe
-        exclude = ('pub_date',)  # Исключаем поле с датой публикации
+        fields = (
+            'id',
+            'name',
+            'cooking_time',
+            'image',
+        )
 
     def get_is_favorited(self, obj):
         """Проверка на наличие в избранном."""
@@ -359,93 +358,20 @@ class SubscribeRecipeSerializer(serializers.ModelSerializer):
 class SubscribeSerializer(serializers.ModelSerializer):
     """Сериализатор создания подписки."""
 
-    id = serializers.IntegerField()
-    email = serializers.EmailField()
-    username = serializers.CharField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    is_subscribed = serializers.BooleanField(read_only=True)
-    recipes = serializers.SerializerMethodField()
-    recipe_count = serializers.IntegerField(read_only=True)
-    avatar = serializers.ImageField()
-
-    class Meta:
-        """Мета-класс сериализатора."""
-        model = User
-        fields = (
-            'id',
-            'email',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes',
-            'recipe_count',
-            'avatar',
-        )
-
-    def get_recipe_count(self, obj):
-        """Получение количества рецептов автора."""
-        return obj.recipes.count() if obj.recipes.exists() else 0
-
-    def get_recipes(self, obj):
-        """Получение рецептов автора с учетом лимита."""
-        request = self.context.get('request')
-        if not request:
-            return []
-        recipes = obj.recipes.all()
-        recipes_limit = request.query_params.get('recipes_limit')
-        if recipes_limit is not None:
-            try:
-                recipes_limit = int(recipes_limit)
-                recipes = recipes[:recipes_limit]
-            except ValueError:
-                pass
-
-        return SubscribeRecipeSerializer(recipes, many=True,
-                                         context={'request': request}).data
-
-    def to_representation(self, instance):
-        """Переопределяем to_representation для
-        добавления recipe_count в ответ.
-        """
-        # Потому что другого я не придумал.
-        data = super().to_representation(instance)
-        data['recipe_count'] = self.get_recipe_count(instance)
-        return data
-
-    def subscribe(self, user):
-        """Логика подписки на пользователя."""
-        user_to_subscribe = self.instance
-        if user == user_to_subscribe:
-            raise serializers.ValidationError(
-                {"detail": "Нельзя подписаться на самого себя."})
-        subscription, created = Subscriptions.objects.get_or_create(
-            user=user,
-            author=user_to_subscribe)
-        serialized_data = self.data
-        serialized_data['is_subscribed'] = True
-        return serialized_data, created
-
-
-class SubscribeViewSerializer(serializers.ModelSerializer):
-    """Сериализатор для отображения информации о подписке."""
-
-    # Используем связанные поля через авторов подписки (user и author)
-    # Надо подумать, как сделать этот и предыдущий сериализатор одним
     id = serializers.IntegerField(source='author.id')
     email = serializers.EmailField(source='author.email')
     username = serializers.CharField(source='author.username')
     first_name = serializers.CharField(source='author.first_name')
     last_name = serializers.CharField(source='author.last_name')
-    is_subscribed = serializers.BooleanField(read_only=True)
-    recipes = serializers.SerializerMethodField()
-    recipe_count = serializers.IntegerField(read_only=True)
     avatar = serializers.ImageField(source='author.avatar')
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        """Мета-класс сериализатора."""
-        model = User
+        """Мета-класс для настройки сериализатора."""
+
+        model = Subscriptions
         fields = (
             'id',
             'email',
@@ -453,39 +379,29 @@ class SubscribeViewSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            'recipe_count',
+            'recipes_count',
             'avatar',
             'recipes',
         )
 
-    def get_recipes_count(self, obj):
-        """Получение количества рецептов автора."""
-        return obj.author.recipes.count() if obj.author.recipes.exists() else 0
+    def get_is_subscribed(self, obj):
+        """Проверяет, подписан ли текущий пользователь на автора."""
+        user = self.context['request'].user
+        queryset = Subscriptions.objects.filter(
+            user=user, author=obj.author).exists()
+        if queryset:
+            return True
+        return False
 
     def get_recipes(self, obj):
         """Получение рецептов автора с учетом лимита."""
-        request = self.context.get('request')
-        if not request:
-            return []
+        recipes_limit = self.context.get('recipes_limit')
+        recipes = obj.author.recipes.all()[:recipes_limit]
+        return RecipeViewSerializer(recipes, many=True, context=self.context).data
 
-        recipes = obj.author.recipes.all()
-        recipes_limit = request.query_params.get('recipes_limit')
-
-        if recipes_limit is not None:
-            try:
-                recipes_limit = int(recipes_limit)
-                recipes = recipes[:recipes_limit]
-            except ValueError:
-                pass
-
-        return SubscribeRecipeSerializer(recipes,
-                                         many=True,
-                                         context={'request': request}).data
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['recipe_count'] = self.get_recipes_count(instance)
-        return data
+    def get_recipes_count(self, obj):
+        """Получение количества рецептов автора."""
+        return obj.author.recipes.count()
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
