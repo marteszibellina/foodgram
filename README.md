@@ -83,7 +83,7 @@ sudo docker-compose exec -t <CONTAINER ID> python3 manage.py createsuperuser
 - `api/igredients/{igredient_id}/` (GET):  получаем информацию о ингредиенте по id.
 - `api/recipes/{recipes_id}/favorite` (GET, POST): подписаться, отписаться или получить список всех избранных постов.
 - `api/recipes/{recipes_id}/cart` (GET, POST): добавить, удалить или получить список всех рецептов в корзине.
-- `api/recipes/download_shopping_cart` (GET): получить список ингредиентов в формате pdf.
+- `api/recipes/download_shopping_cart` (GET): получить список ингредиентов в формате .txt.
 
 ## Дипломный проект подготовил:
 
