@@ -30,6 +30,15 @@ const Technologies = () => {
               <li className={styles.textItem}>
                 Djoser
               </li>
+              <li className={styles.textItem}>
+                React
+              </li>
+              <li className={styles.textItem}>
+                Docker
+              </li>
+              <li className={styles.textItem}>
+                Тайцзицюань (курлык)
+              </li>
             </ul>
           </div>
         </div>
