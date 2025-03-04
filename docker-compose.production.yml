@@ -1,0 +1,39 @@
+version: '3'
+
+volumes:  # Подключаемые тома
+  pg_data:  # Для PostgreSQL
+  static:  # Для статики
+  media:  # Для медиа-файлов (картинки)
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data  # Подключение том для данных БД
+    env_file: .env  # Подключение .env для контейнера db
+  backend:
+    image: marteszibellina/foodgram_backend
+    env_file: .env
+    volumes:
+      - static:/app/collected_static  # Статика
+      - media:/app/media  # Медиа
+    depends_on:
+      - db
+  frontend:
+    image: marteszibellina/foodgram_frontend
+    command: cp -r /app/build/. /static/
+    volumes:
+      - static:/static
+
+  gateway:
+    image: marteszibellina/foodgram_gateway
+    env_file: .env
+    volumes:
+    - static:/static
+    - media:/media
+    - ../frontend/build:/usr/share/nginx/html/
+    - ../docs/:/usr/share/nginx/html/api/docs/
+    depends_on:
+      - backend
+    ports:
+      - 8000:80
