@@ -3,9 +3,9 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 
 from django.core.management.utils import get_random_secret_key
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 DEBUG = True
 
 # Не забудь вернуть в продакшн исходное состояние
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost, 127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost, 127.0.0.1').split()
 # ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -114,11 +114,10 @@ USE_TZ = True
 
 # Статика проекта
 STATIC_URL = '/static/'
-STATIC_ROOT = 'backend/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
-# Медиа проекта
 MEDIA_URL = '/media/'
-MEDIA_ROOT = 'backend/media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

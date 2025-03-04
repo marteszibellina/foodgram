@@ -39,8 +39,8 @@ class IngredientFilter(filters.FilterSet):
     # Фильтр по названию
     name = filters.CharFilter(
         field_name='name',
-        # Ищем подстроку
-        lookup_expr='icontains',)
+        # Ищем по началу
+        lookup_expr='istartswith',)
 
     class Meta:
         """Мета-класс фильтра"""
