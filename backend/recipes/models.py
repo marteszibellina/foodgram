@@ -18,7 +18,6 @@ from recipes.constants import (
     MIN_COOKING_TIME,
     TEXT_SLICE,
     MAX_RECIPE_TEXT_LENGTH,
-    MAX_TAG_HEX_COLOR_LENGTH,
     MIN_INGREDIENT_AMOUNT,
     MAX_INGREDIENT_AMOUNT,
     INGREDIENT_AMOUNT_ERROR,
@@ -70,13 +69,6 @@ class Tag(models.Model):
         unique=True,
         blank=False,
         validators=[validate_tag_slug],
-    )
-
-    color = models.CharField(
-        verbose_name='Цвет тега',
-        max_length=MAX_TAG_HEX_COLOR_LENGTH,
-        unique=False,
-        default='#FFFFFF',
     )
 
     class Meta:

@@ -8,7 +8,6 @@
 """
 
 import base64
-import webcolors
 
 from djoser.serializers import UserCreateSerializer as UCS
 from djoser.serializers import SetPasswordSerializer
@@ -36,20 +35,6 @@ from recipes import constants
 from users.models import Subscriptions
 
 User = get_user_model()
-
-
-class Hex2NameColor(serializers.Field):
-    """Сериализатор для преобразования цвета в его название."""
-
-    def to_representation(self, value):
-        return value
-
-    def to_internal_value(self, data):
-        try:
-            data = webcolors.hex_to_name(data)
-        except ValueError:
-            raise serializers.ValidationError('Для этого цвета нет имени')
-        return data
 
 
 class Base64ImageField(serializers.ImageField):
