@@ -6,15 +6,14 @@
 """
 from io import BytesIO
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, OuterRef, Sum, Count
+from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, get_list_or_404
 
 from djoser.views import UserViewSet as UVS
 
-from rest_framework import status, serializers, viewsets, exceptions
-from rest_framework.decorators import action, api_view
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework import permissions
 from rest_framework.response import Response
 
@@ -57,9 +56,7 @@ class TagViewSet(viewsets.ModelViewSet):
     http_method_names = ['get',]
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    # Доступно всем
     permission_classes = (permissions.AllowAny,)
-    # Пагинация не требуется
     pagination_class = None
 
     def get_permissions(self):
@@ -76,11 +73,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     http_method_names = ['get',]
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    # Доступно всем
     permission_classes = (ReadOnly,)
-    # Пагинация не требуется
     pagination_class = None
-    # По умолчанию: фильтрация по названию
     filterset_class = IngredientFilter
 
     def get_permissions(self):
@@ -95,9 +89,7 @@ class UserViewSet(UVS):
     """Вьюсет для пользователей."""
 
     serializer_class = UserCreateSerializer
-    # Доступно всем
     permission_class = (permissions.AllowAny, ReadOnly)
-    # Пагинация не требуется
     pagination_class = CustomPagination
 
     def get_queryset(self):
@@ -112,10 +104,8 @@ class UserViewSet(UVS):
 
     def get_serializer_class(self):
         """Получение сериализатора."""
-        # Если требуется сменить пароль, то возвращаем сериализатор
         if self.action == 'set_password':
             return UserPasswordSerializer
-        # Если требуется создать пользователя, то возвращаем сериализатор
         if self.action == 'create':
             return UserCreateSerializer
         if self.action == 'set_avatar':
@@ -126,7 +116,6 @@ class UserViewSet(UVS):
             return SubscribeSerializer
         return UserViewSerializer
 
-    # Получение информации о текущем пользователе
     @action(detail=False,
             methods=['get'],
             url_path='me',
@@ -136,7 +125,6 @@ class UserViewSet(UVS):
         serializer = UserViewSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # Создание пользователя
     def create(self, request):
         """Создание пользователя."""
         serializer = UserCreateSerializer(data=request.data)
@@ -144,7 +132,6 @@ class UserViewSet(UVS):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # Смена или добавление аватара
     @action(detail=True,
             methods=['get', 'put', 'delete'],
             url_path='avatar',
@@ -170,7 +157,6 @@ class UserViewSet(UVS):
             user.avatar.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # Подписка на пользователя
     @action(detail=True,
             methods=['post', 'delete'],
             url_path='subscribe',
@@ -178,37 +164,24 @@ class UserViewSet(UVS):
             pagination_class=CustomPagination)
     def subscribe(self, request, id):
         """Подписка на пользователя."""
-        user = request.user
-        recipes_limit = int(request.query_params.get('recipes_limit', 3))
         if request.method == 'POST':
+            recipes_limit = int(request.query_params.get('recipes_limit', 3))
             author = get_object_or_404(User, id=id)
-            if Subscriptions.objects.filter(
-                user=user,
-                author=author
-            ).exists():
-                return Response(
-                    {'detail': 'Вы уже подписаны на этого автора'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
 
-            if author == user:
-                return Response(
-                    {'detail': 'Нельзя подписаться на самого себя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            subscription = Subscriptions.objects.create(
-                user=user,
-                author=author
-            )
+            # Передаем объект 'author' через context
             serializer = SubscribeSerializer(
-                subscription,
-                context={'request': request, 'recipes_limit': recipes_limit}
+                data={},
+                context={'request': request,
+                         'recipes_limit': recipes_limit,
+                         'author': author}
             )
+            serializer.is_valid(raise_exception=True)
+            subscription = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
             author = self.get_object()
+            user = request.user
             try:
                 Subscriptions.objects.get(user=user, author=author)
             except Subscriptions.DoesNotExist:
@@ -249,9 +222,7 @@ class UserViewSet(UVS):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами."""
 
-    # Используем сериализатор создания рецептов по умолчанию
     serializer_class = RecipeCreateSerializer
-    # Используем фильтры для рецептов
     filterset_class = RecipeFilter
     pagination_class = CustomPagination
 
@@ -360,22 +331,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         """Добавление и удаление рецепта в избранное."""
         recipe = get_object_or_404(Recipe, id=pk)
-        # В случае POST — добавляем рецепт в избранное
         if request.method == 'POST':
-            # Подготовка данных для сериализатора
+
             data = {
                 'user': request.user.id,
                 'recipe': recipe.id
             }
-            # Создаем и валидируем сериализатор
-            serializer = FavoriteSerializer(data=data, context={"request": request})
-            # Проверка на валидность
+            serializer = FavoriteSerializer(data=data,
+                                            context={"request": request})
             serializer.is_valid(raise_exception=True)
-            # Сохраняем избранное
             favorite = serializer.save(user=request.user)
-            # Сериализуем объект Favorite
-            serializer = FavoriteSerializer(favorite, context={"request": request})
-            # Возвращаем полные данные рецепта
+            serializer = FavoriteSerializer(favorite,
+                                            context={"request": request})
             recipe_data = {
                 'id': recipe.id,
                 'name': recipe.name,
@@ -383,9 +350,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'cooking_time': recipe.cooking_time
             }
             return Response(recipe_data, status=status.HTTP_201_CREATED)
-        # В случае DELETE — удаляем рецепт из избранного
         if request.method == 'DELETE':
-            favorite = Favorite.objects.filter(user=request.user, recipe=recipe).first()
+            favorite = Favorite.objects.filter(user=request.user,
+                                               recipe=recipe).first()
             if favorite:
                 favorite.delete()
                 return Response({
@@ -402,16 +369,11 @@ class SubscribeViewSet(viewsets.ModelViewSet):
 
     http_method_names = ['get', 'list,', 'retrieve', 'post', 'delete']
     serializer_class = SubscribeSerializer
-    # Доступно только для авторизованного пользователя
     permission_class = (permissions.IsAuthenticated,)
-    # Пагинация не требуется
     pagination_class = CustomPagination
 
     def get_queryset(self):
         """Получение списка подписок."""
-        # Если пользователь не авторизован, то возвращаем пустой список
-        # Если авторизован, возвращаем список пользователей,
-        # на которых он подписан
         return get_list_or_404(
             User.objects.filter(following__user=self.request.user))
 
@@ -426,9 +388,7 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
 
     queryset = ShoppingCart.objects.all()
     serializer_class = ShoppingCartSerializer
-    # Доступно только для авторизованного пользователя
     permission_class = (permissions.IsAuthenticated,)
-    # Пагинация не требуется
     pagination_class = None
 
     def get_queryset(self):
@@ -441,9 +401,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
     queryset = Favorite.objects.all()
     serializer_class = RecipeViewSerializer
-    # Доступно только для авторизованного пользователя
     permission_class = (permissions.IsAuthenticated,)
-    # Пагинация не требуется
     pagination_class = None
 
     def get_queryset(self):
