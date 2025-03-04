@@ -29,13 +29,12 @@ def send_confirmation_email(user, confirmation_code):
 
 def recipe_create(recipe, ingredients):
     """Создание рецепта"""
-    ingredient_list = [
-            RecipeIngredient(
-                ingredient=ingredient['id'],
-                recipe=recipe,
-                amount=ingredient['amount'],
-            )
-            for ingredient in ingredients]
+    ingredient_list = [RecipeIngredient(
+        ingredient=ingredient['id'],
+        recipe=recipe,
+        amount=ingredient['amount'],
+    )
+        for ingredient in ingredients]
     return RecipeIngredient.objects.bulk_create(ingredient_list)
 
 

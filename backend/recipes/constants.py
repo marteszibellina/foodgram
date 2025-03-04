@@ -30,5 +30,5 @@ TEXT_SLICE = 20
 
 # [СООБЩЕНИЯ]
 # Время готовки
-COOKING_TIME_ERROR = f'Время приготовления должно быть от {MIN_COOKING_TIME} до {MAX_COOKING_TIME} мин.'
+COOKING_TIME_ERROR = 'Время приготовления должно быть от 1 до 600 минут.'
 INGREDIENT_AMOUNT_ERROR = 'Количество ингридиентов должно быть больше 1.'
