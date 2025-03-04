@@ -35,7 +35,7 @@ User = get_user_model()
 class TagViewSet(viewsets.ModelViewSet):
     """Вьюсет для тегов."""
 
-    http_method_names = ['get',]
+    http_method_names = ['get', ]
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (permissions.AllowAny,)
@@ -52,7 +52,7 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     """Вьюсет для ингредиентов."""
 
-    http_method_names = ['get',]
+    http_method_names = ['get', ]
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (ReadOnly,)
