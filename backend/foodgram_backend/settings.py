@@ -14,8 +14,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 # Не забудь вернуть в продакшн исходное состояние
-# DEBUG = os.getenv('DEBUG', 'False').lower() == 'True'
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'True'
+# DEBUG = True
 
 # Не забудь вернуть в продакшн исходное состояние
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost, 127.0.0.1').split()
@@ -101,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'ru-Ru'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
 
