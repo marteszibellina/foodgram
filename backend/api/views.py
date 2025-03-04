@@ -5,46 +5,28 @@
 @author: marteszibellina
 """
 from io import BytesIO
+
 from django.contrib.auth import get_user_model
 from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404, get_list_or_404
-
+from django.shortcuts import get_list_or_404, get_object_or_404
 from djoser.views import UserViewSet as UVS
-
-from rest_framework import status, viewsets
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework import permissions
 from rest_framework.response import Response
 
-from api.filters import RecipeFilter, IngredientFilter
-from api.serializers import (TagSerializer,
-                             IngredientSerializer,
-                             RecipeViewSerializer,
-                             RecipeCreateSerializer,
-                             ShoppingCartSerializer,
-                             UserViewSerializer,
-                             UserCreateSerializer,
-                             UserPasswordSerializer,
-                             UserAvatarSerializer,
-                             SubscribeSerializer,
-                             RecipeShortSerializer,
-                             FavoriteSerializer,
-                             )
+from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
-from api.permissions import (ReadOnly,
-                             AdminOrCurrentUser,
-                             )
+from api.permissions import AdminOrCurrentUser, ReadOnly
+from api.serializers import (FavoriteSerializer, IngredientSerializer,
+                             RecipeCreateSerializer, RecipeShortSerializer,
+                             RecipeViewSerializer, ShoppingCartSerializer,
+                             SubscribeSerializer, TagSerializer,
+                             UserAvatarSerializer, UserCreateSerializer,
+                             UserPasswordSerializer, UserViewSerializer)
 from api.utils import create_list_txt, create_short_link
-
-from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    Favorite,
-    ShoppingCart,
-)
 from users.models import Subscriptions
 
 User = get_user_model()

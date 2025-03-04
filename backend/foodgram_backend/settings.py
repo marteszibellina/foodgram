@@ -3,8 +3,9 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
+
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -17,8 +18,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 DEBUG = True
 
 # Не забудь вернуть в продакшн исходное состояние
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost, 127.0.0.1').split(',')
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost, 127.0.0.1').split(',')
+# ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,23 +67,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-# Не забудь вернуть в продакшн исходное состояние
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
-#         'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
-#         'HOST': os.getenv('DB_HOST', ''),
-#         'PORT': os.getenv('DB_PORT', '5232')
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# Не забудь вернуть в продакшн исходное состояние
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
+        'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'foodgram_password'),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', '5232')
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

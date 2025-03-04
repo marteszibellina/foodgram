@@ -7,14 +7,9 @@
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 
-from recipes.models import (Ingredient,
-                            Tag,
-                            Recipe,
-                            RecipeIngredient,
-                            Favorite,
-                            ShoppingCart,
-                            )
 from users.models import Subscriptions
 
 User = get_user_model()

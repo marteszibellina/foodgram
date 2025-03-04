@@ -5,14 +5,14 @@
 @author: marteszibellina
 """
 
-import io
 import datetime as dt
+import io
 
 from django.conf import settings
 from django.core.mail import send_mail
+from recipes.models import RecipeIngredient
 from rest_framework import serializers
 
-from recipes.models import RecipeIngredient, Ingredient
 from users.models import Subscriptions
 
 

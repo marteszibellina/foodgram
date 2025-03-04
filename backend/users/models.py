@@ -11,12 +11,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from users.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
-                             FIRST_NAME_MAX_LENGTH, LAST_NAME_MAX_LENGTH,
-                             PASSWORD_MAX_LENGTH,)
-from users.validators import (validate_username,
-                              validate_password,
-                              selfsubscribe)
+from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
+                             LAST_NAME_MAX_LENGTH, PASSWORD_MAX_LENGTH,
+                             USERNAME_MAX_LENGTH)
+from users.validators import (selfsubscribe, validate_password,
+                              validate_username)
 
 
 class User(AbstractUser):

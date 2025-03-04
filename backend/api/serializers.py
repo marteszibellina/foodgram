@@ -9,29 +9,16 @@
 
 import base64
 
-from djoser.serializers import UserCreateSerializer as UCS
-from djoser.serializers import SetPasswordSerializer
-
-from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
-
+from django.core.files.base import ContentFile
+from djoser.serializers import SetPasswordSerializer
+from djoser.serializers import UserCreateSerializer as UCS
+from recipes import constants
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from rest_framework import serializers, validators
 
-
-from api.utils import (recipe_create,
-                       check_favorite_in_list,
-                       UserSubscribe)
-
-from recipes.models import (Ingredient,
-                            Tag,
-                            Recipe,
-                            RecipeIngredient,
-                            Favorite,
-                            ShoppingCart,
-                            )
-
-from recipes import constants
-
+from api.utils import UserSubscribe, check_favorite_in_list, recipe_create
 from users.models import Subscriptions
 
 User = get_user_model()
@@ -322,17 +309,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         """Создание нового рецепта."""
         print('VALIDATA: ', validated_data)
         user = self.context['request'].user
-        print('USER: ', user)  # Вывод пользователя
+        print('USER: ', user)
         validated_data['author'] = user
-        # ingredients = validated_data.get('recipe_ingredients')
         ingredients = validated_data.pop('recipe_ingredients')
-        print('INGREDIENTS: ', ingredients)  # Вывод ингредиентов
+        print('INGREDIENTS: ', ingredients)
         self.validate_ingredients(ingredients)
-        # tags = validated_data.get('tags')
         tags = validated_data.pop('tags')
         self.validate_tags(tags)
         self.validate_name(validated_data['name'])
-        print('TAGS: ', tags)  # Вывод тегов
+        print('TAGS: ', tags)
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         recipe_create(recipe, ingredients)
@@ -450,7 +435,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
         """Получение количества рецептов автора."""
         return obj.author.recipes.count()
 
-    # Новое
     def create(self, validated_data):
         """Создание подписки."""
         user = self.context['request'].user

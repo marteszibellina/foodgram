@@ -7,20 +7,12 @@ URLs для приложения api, работающая с Recipes и Users
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
-
-# from djoser.views import UserViewSet
-
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 # Импорт viewsets тут
-from api.views import (RecipeViewSet,
-                       TagViewSet,
-                       IngredientViewSet,
-                       FavoriteViewSet,
-                       ShoppingCartViewSet,
-                       UserViewSet,
-                       SubscribeViewSet,
-                       )
+from api.views import (FavoriteViewSet, IngredientViewSet, RecipeViewSet,
+                       ShoppingCartViewSet, SubscribeViewSet, TagViewSet,
+                       UserViewSet)
 
 router_v1 = DefaultRouter()  # Роутер API v1
 
