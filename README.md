@@ -8,7 +8,7 @@ Foodgram - приложение для публикации, просмотра 
 
 ## Технологии:
 
-- python
+- python 3.9
 - Django
 - Django REST Framework
 - Djoser
@@ -64,8 +64,21 @@ sudo docker-compose exec -t <CONTAINER ID> python3 manage.py createsuperuser
 - Фамилия
 - Пароль
 
-6. Зайдите в админку сайта и создайте теги рецептов (вход по никнейму и паролю).
+6. Загрузите ингредиенты в проект:
+```
+sudo docker-compose exec -t <CONTAINER ID> python3 manage.py csv_import
+```
+Ингредиенты находятся по пути: backend/data/ingredients.csv
+
+7. Зайдите в админ-зону сайта и создайте теги рецептов (вход по никнейму и паролю).
 По умолчанию тегов нет, но создавать их может только администратор.
+Потребуется придумать название тега и его slug.
+
+Пример:
+```
+Название: Breakfast
+slug: breakfast
+```
 
 ### Примеры запросов:
 
@@ -87,5 +100,5 @@ sudo docker-compose exec -t <CONTAINER ID> python3 manage.py createsuperuser
 
 ## Дипломный проект подготовил:
 
-<h3 align="center"><a href="https://github.com/marteszibellina" target="_blank">#Дмитрий Соболев#</a> 
+<h3 align="center"><a href="https://github.com/marteszibellina" target="_blank">Дмитрий Соболев</a> 
 </h3>
