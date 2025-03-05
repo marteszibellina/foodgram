@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Константы для модели пользователя.
-
-@author: marteszibellina
-"""
 
 # Модель пользователя
 EMAIL_MAX_LENGTH = 254

@@ -1,21 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Модель пользователя.
-
-@author: marteszibellina
-"""
 
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tokens import default_token_generator
+# from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
+# from django.utils import timezone
 
 from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
-                             LAST_NAME_MAX_LENGTH, PASSWORD_MAX_LENGTH,
+                             LAST_NAME_MAX_LENGTH,  # PASSWORD_MAX_LENGTH,
                              USERNAME_MAX_LENGTH)
-from users.validators import (selfsubscribe, validate_password,
-                              validate_username)
+from users.validators import (selfsubscribe)  # , validate_password)
 
 
 class User(AbstractUser):
@@ -30,7 +25,7 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя (никнейм)',
         max_length=USERNAME_MAX_LENGTH,
-        validators=[validate_username],
+        validators=[UnicodeUsernameValidator()],
         unique=True,
         help_text='Укажите Ваш никнейм'
     )
@@ -46,26 +41,14 @@ class User(AbstractUser):
         blank=False,
         help_text='Укажите Вашу фамилию'
     )
-    password = models.CharField(
-        verbose_name='Пароль',
-        max_length=PASSWORD_MAX_LENGTH,
-        validators=[validate_password],
-        blank=False,
-        help_text='Укажите Ваш пароль'
-    )
     avatar = models.ImageField(
         verbose_name='Аватар',
         upload_to='users/',
         blank=True,
     )
-    date_joined = models.DateField(
-        verbose_name='Дата регистрации',
-        default=timezone.now,
-    )
 
-    EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'password']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         """Мета-класс модели."""
@@ -76,20 +59,8 @@ class User(AbstractUser):
     def __str__(self):
         """Возвращает имя, фамилию и никнейм пользователя."""
         return (
-            f'Пользователь:{self.first_name} {self.last_name}'
+            f'(Пользователь:{self.first_name} {self.last_name} '
             f'({self.username})')
-
-    # Метод для генерации кода подтверждения
-    @property
-    def generate_confirmation_code(self):
-        """Метод для генерации кода подтверждения
-        через default_token_generator."""
-        return default_token_generator.make_token(self)
-
-    def check_confirmation_code(self, code):
-        """Метод для проверки кода подтверждения
-        через default_token_generator."""
-        return default_token_generator.check_token(self, code)
 
 
 class Subscriptions(models.Model):
@@ -106,7 +77,6 @@ class Subscriptions(models.Model):
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор рецептов',
-        # НАСТРОИТЬ
         validators=[selfsubscribe],
     )
 
@@ -115,6 +85,12 @@ class Subscriptions(models.Model):
 
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_subscription'
+            )
+        ]
 
     def __str__(self):
         """Возвращает имя, фамилию и никнейм пользователя."""

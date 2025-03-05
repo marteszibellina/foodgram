@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Фильтры для приложения api, работающие с Recipes и Users
-
-@author: dmitry
-"""
 
 from django_filters import rest_framework as filters
 from recipes.models import Ingredient, Recipe, Tag
@@ -23,14 +18,35 @@ class RecipeFilter(filters.FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),)
 
+    # Фильтры по избранному
+    is_favorited = filters.BooleanFilter(
+        method='filter_is_favorited',
+        label='В избранном',)
+
+    # Фильтры по списку покупок
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_is_in_shopping_cart',
+        label='В списке покупок',)
+
     class Meta:
         """Мета-класс фильтра"""
 
         model = Recipe
         # По умолчанию: фильтрация по избранному, автору, тегу и списку покупок
         fields = ('author',
-                  'tags',
-                  )
+                  'tags',)
+
+    def filter_is_favorited(self, queryset, name, value):
+        """Фильтр по избранному"""
+        if value:
+            return queryset.filter(favorite__isnull=False).distinct()
+        return queryset
+
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        """Фильтр по списку покупок"""
+        if value:
+            return queryset.filter(shopping_cart__isnull=False).distinct()
+        return queryset
 
 
 class IngredientFilter(filters.FilterSet):

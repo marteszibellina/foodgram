@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Загрузка csv-файла
-
-@author: marteszibelina
-"""
 
 import csv
 
@@ -31,6 +26,7 @@ class Command(BaseCommand):
         )
         Ingredient.objects.bulk_create(
             [Ingredient(**data) for data in reader],
+            ignore_conflicts=True,
         )
         if Ingredient.objects.count() > number:
             self.stdout.write('Ингредиенты успешно загружены')

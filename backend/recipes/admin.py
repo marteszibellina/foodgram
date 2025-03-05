@@ -1,45 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Администрирование всех моделей
-
-@author: marteszibellina
-"""
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.db.models import Count
+
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-
-from users.models import Subscriptions
 
 User = get_user_model()
 
 
-class UserAdmin(admin.ModelAdmin):
-    """Модель администрирования пользователя"""
-
-    list_display = ('pk',
-                    'username',
-                    'email',
-                    'first_name',
-                    'last_name',
-                    'date_joined'
-                    )
-    list_display_links = ('pk', 'username', 'email',)
-    search_fields = ('username', 'email',)
-    list_filter = ('username', 'email',)
-    empty_value_display = '-пусто-'
-
-
-class SubsriptionsAdmin(admin.ModelAdmin):
-    """Модель администрирования подписок"""
-
-    list_display = ('pk', 'user', 'author',)
-    list_display_links = ('user', 'author',)
-    search_fields = ('user', 'author',)
-    list_filter = ('user',)
-
-
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     """Модель администрирования ингредиентов"""
 
@@ -49,14 +20,25 @@ class IngredientAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-# Есть ли смысл?
 class IngredientInLine(admin.TabularInline):
     """Модель отображения ингредиентов в табличном формате"""
 
-    model = Ingredient
+    model = RecipeIngredient
     fields = ('name', 'measurement_unit',)
+    extra = 1
 
 
+@admin.register(RecipeIngredient)
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    """Модель администрирования рецепта и ингредиента"""
+
+    extra = 1
+
+    list_display = ('recipe', 'ingredient', 'amount',)
+    list_display_links = ('recipe', 'ingredient',)
+
+
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Модель администрирования тегов"""
 
@@ -65,6 +47,7 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     """Модель администрирования рецептов"""
 
@@ -73,21 +56,26 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('author', 'name',)
     list_filter = ('tags',)
     empty_value_display = '-пусто-'
+    inlines = (IngredientInLine,)
+
+    def get_queryset(self, request):
+        """Переопределение списка рецептов в избранном"""
+        queryset = super().get_queryset(request)
+        return queryset.annotate(favorites_count=Count('favorites'))
 
     def favorites_count(self, obj):
         """Выводит общее число добавлений этого рецепта в избранное"""
         # Берём модель избраного и через queryset отбираем значение
         # с выводом количества раз
-        return Favorite.objects.filter(recipe=obj).count()
+        return obj.favorites_count
+
+    favorites_count.short_description = 'Добавлено в избранное'
+    favorites_count.admin_order_field = 'favorites_count'
 
 
-class RecipeIngredientAdmin(admin.ModelAdmin):
-    """Модель администрирования рецепта и ингредиента"""
-
-    list_display = ('recipe', 'ingredient', 'amount',)
-    list_display_links = ('recipe', 'ingredient',)
 
 
+@admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     """Модель администрирования избранного"""
 
@@ -97,6 +85,7 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_filter = ('recipe',)
 
 
+@admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     """Модель администрирования списка покупок"""
 
@@ -104,14 +93,5 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     list_display_links = ('pk', 'user', 'recipe',)
     search_fields = ('user', 'recipe',)
 
-
-admin.site.register(User, UserAdmin)
-admin.site.register(Subscriptions, SubsriptionsAdmin)
-admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
-admin.site.register(Favorite, FavoriteAdmin)
-admin.site.register(ShoppingCart, ShoppingCartAdmin)
 
 admin.site.site_header = 'FoodGram. Администрирование.'

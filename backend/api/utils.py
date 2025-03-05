@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Утилиты для приложения api при работе с Users
-
-@author: marteszibellina
-"""
 
 import datetime as dt
 import io
@@ -16,35 +11,22 @@ from rest_framework import serializers
 from users.models import Subscriptions
 
 
-def send_confirmation_email(user, confirmation_code):
-    """Отправка подтверждения регистрации"""
-    subject = 'Подтверждение регистрации FoodGram'
-    message = (f'Ваш код подтверждения {confirmation_code}.',
-               'Если Вы не делали запрос на регистрацию,',
-               'то проигнорируйте это письмо.')
-    from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [user.email]
-    send_mail(subject, message, from_email, recipient_list)
+# def send_confirmation_email(user, confirmation_code):
+#     """Отправка подтверждения регистрации"""
+#     subject = 'Подтверждение регистрации FoodGram'
+#     message = (f'Ваш код подтверждения {confirmation_code}.',
+#                'Если Вы не делали запрос на регистрацию,',
+#                'то проигнорируйте это письмо.')
+#     from_email = settings.DEFAULT_FROM_EMAIL
+#     recipient_list = [user.email]
+#     send_mail(subject, message, from_email, recipient_list)
 
-
-def recipe_create(recipe, ingredients):
-    """Создание рецепта"""
-    ingredient_list = [RecipeIngredient(
-        ingredient=ingredient['id'],
-        recipe=recipe,
-        amount=ingredient['amount'],
-    )
-        for ingredient in ingredients]
-    return RecipeIngredient.objects.bulk_create(ingredient_list)
-
+# Перенести в статикметод сериализатора
 
 def check_favorite_in_list(request, obj, model):
     """Проверка на наличие в избранном."""
-    # Проверка на авторизацию и наличие рецепта в избранном
-    # в списке покупок.
-    # Проверяем, авторизован ли пользователь,
-    # и есть ли рецепт в избранном.
-    # Если да, то возвращаем True, иначе - False
+    if not request:
+        return False
     return (request.user.is_authenticated and model.objects.filter(
         user=request.user, recipe__id=obj.id).exists())
 
@@ -82,11 +64,15 @@ class UserSubscribe(metaclass=serializers.SerializerMetaclass):
     def get_is_subscribed(self, obj):
         """Проверка на наличие подписки."""
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        # Проверяем, есть ли подписка
-        return Subscriptions.objects.filter(
-            user=request.user, author=obj.id).exists()
+        return not (request is None or request.user.is_anonymous) and \
+            Subscriptions.objects.filter(
+                user=request.user, author=obj.id).exists()  # O_O
+
+        # if request is None or request.user.is_anonymous:
+        #     return False
+        # # Проверяем, есть ли подписка
+        # return Subscriptions.objects.filter(
+        #     user=request.user, author=obj.id).exists()
 
 
 def create_short_link(recipe_id: int, request) -> str:
