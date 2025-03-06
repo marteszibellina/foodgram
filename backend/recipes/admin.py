@@ -24,8 +24,17 @@ class IngredientInLine(admin.TabularInline):
     """Модель отображения ингредиентов в табличном формате"""
 
     model = RecipeIngredient
-    fields = ('name', 'measurement_unit',)
+    fields = ('ingredient', 'amount',)
     extra = 1
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    """Модель администрирования тегов"""
+
+    list_display = ('pk', 'name', 'slug',)
+    search_fields = ('name', 'slug',)
+    empty_value_display = '-пусто-'
 
 
 @admin.register(RecipeIngredient)
@@ -36,15 +45,6 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 
     list_display = ('recipe', 'ingredient', 'amount',)
     list_display_links = ('recipe', 'ingredient',)
-
-
-@admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
-    """Модель администрирования тегов"""
-
-    list_display = ('pk', 'name', 'slug',)
-    search_fields = ('name', 'slug',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Recipe)
@@ -61,7 +61,7 @@ class RecipeAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """Переопределение списка рецептов в избранном"""
         queryset = super().get_queryset(request)
-        return queryset.annotate(favorites_count=Count('favorites'))
+        return queryset.annotate(favorites_count=Count('favorite'))
 
     def favorites_count(self, obj):
         """Выводит общее число добавлений этого рецепта в избранное"""
@@ -71,8 +71,6 @@ class RecipeAdmin(admin.ModelAdmin):
 
     favorites_count.short_description = 'Добавлено в избранное'
     favorites_count.admin_order_field = 'favorites_count'
-
-
 
 
 @admin.register(Favorite)

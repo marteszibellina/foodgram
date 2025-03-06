@@ -7,11 +7,10 @@ from django.db import models
 from recipes.constants import (COOKING_TIME_ERROR, INGREDIENT_AMOUNT_ERROR,
                                MAX_COOKING_TIME, MAX_INGRED_MEASURE_LENGTH,
                                MAX_INGRED_NAME_LENGTH, MAX_INGREDIENT_AMOUNT,
-                               MAX_RECIPE_NAME,  #MAX_RECIPE_TEXT_LENGTH,
+                               MAX_RECIPE_NAME,
                                MAX_TAG_NAME_LENGTH, MAX_TAG_SLUG_LENGTH,
                                MIN_COOKING_TIME, MIN_INGREDIENT_AMOUNT,
                                TEXT_SLICE)
-# from recipes.validators import validate_tag_slug
 
 User = get_user_model()
 
@@ -61,7 +60,6 @@ class Tag(models.Model):
         max_length=MAX_TAG_SLUG_LENGTH,
         unique=True,
         blank=False,
-        # validators=[validate_tag_slug],
     )
 
     class Meta:
@@ -95,7 +93,6 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         verbose_name='Текст рецепта',
-        # max_length=MAX_RECIPE_TEXT_LENGTH,
     )
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -129,7 +126,7 @@ class Recipe(models.Model):
             # или есть такое же название
             models.UniqueConstraint(
                 fields=['author', 'name'],
-                name='unique_author_recipe')
+                name='unique_author_recipe'),
         ]
 
     def __str__(self):
@@ -186,13 +183,13 @@ class BaseFavotireShoppingCart(models.Model):
         User,
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
-        related_name='%(class)s',
+        related_name='%(class)s',  # user.favorites user.shopping_cart
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='%(class)s',
+        related_name='%(class)s',  # recipe.favorites recipe.shopping_cart
     )
 
     class Meta:
@@ -224,7 +221,6 @@ class Favorite(BaseFavotireShoppingCart):
         return f'Рецепт от {self.user}: {self.recipe}'
 
 
-# class ShoppingList больше подходит для модели списка покупок
 class ShoppingCart(BaseFavotireShoppingCart):
     """Модель списка покупок"""
 

@@ -45,7 +45,7 @@ class RecipeFilter(filters.FilterSet):
     def filter_is_in_shopping_cart(self, queryset, name, value):
         """Фильтр по списку покупок"""
         if value:
-            return queryset.filter(shopping_cart__isnull=False).distinct()
+            return queryset.filter(shoppingcart__isnull=False).distinct()
         return queryset
 
 

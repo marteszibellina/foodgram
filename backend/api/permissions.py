@@ -3,16 +3,16 @@
 from rest_framework import permissions
 
 
-# class IsAdminOrCurrentUser(permissions.BasePermission):
-#     """Разрешение для администратора или текущего пользователя."""
+class IsAdminOrCurrentUser(permissions.BasePermission):
+    """Разрешение для администратора или текущего пользователя."""
 
-#     def has_permission(self, request, view):
-#         """Проверка на авторизацию"""
-#         return request.user.is_authenticated
+    def has_permission(self, request, view):
+        """Проверка на авторизацию"""
+        return request.user.is_authenticated
 
-#     def has_object_permission(self, request, view, obj):
-#         """Проверка на администратора или текущего пользователя."""
-#         return request.user.is_superuser or request.user == obj.author
+    def has_object_permission(self, request, view, obj):
+        """Проверка на администратора или текущего пользователя."""
+        return request.user.is_superuser or request.user == obj.author
 
 
 class IsReadOnly(permissions.BasePermission):

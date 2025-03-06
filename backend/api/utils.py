@@ -3,25 +3,10 @@
 import datetime as dt
 import io
 
-from django.conf import settings
-from django.core.mail import send_mail
-from recipes.models import RecipeIngredient
 from rest_framework import serializers
 
 from users.models import Subscriptions
 
-
-# def send_confirmation_email(user, confirmation_code):
-#     """Отправка подтверждения регистрации"""
-#     subject = 'Подтверждение регистрации FoodGram'
-#     message = (f'Ваш код подтверждения {confirmation_code}.',
-#                'Если Вы не делали запрос на регистрацию,',
-#                'то проигнорируйте это письмо.')
-#     from_email = settings.DEFAULT_FROM_EMAIL
-#     recipient_list = [user.email]
-#     send_mail(subject, message, from_email, recipient_list)
-
-# Перенести в статикметод сериализатора
 
 def check_favorite_in_list(request, obj, model):
     """Проверка на наличие в избранном."""
@@ -67,12 +52,6 @@ class UserSubscribe(metaclass=serializers.SerializerMetaclass):
         return not (request is None or request.user.is_anonymous) and \
             Subscriptions.objects.filter(
                 user=request.user, author=obj.id).exists()  # O_O
-
-        # if request is None or request.user.is_anonymous:
-        #     return False
-        # # Проверяем, есть ли подписка
-        # return Subscriptions.objects.filter(
-        #     user=request.user, author=obj.id).exists()
 
 
 def create_short_link(recipe_id: int, request) -> str:
