@@ -6,9 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-
 from djoser.views import UserViewSet as UVS
-
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from rest_framework import exceptions, permissions, status, viewsets

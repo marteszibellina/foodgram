@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.models import AbstractUser
-
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from users.constants import LAST_NAME_MAX_LENGTH
 from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
-                             USERNAME_MAX_LENGTH)
+                             LAST_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH)
 from users.validators import selfsubscribe
 
 
