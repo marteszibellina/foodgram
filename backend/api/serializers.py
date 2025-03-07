@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth import get_user_model
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError, transaction
 
-from recipes.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    ShoppingCart,
-    Tag,
-)
 from rest_framework import serializers, validators
-
 
 from api.fields import Base64ImageField
 from api.utils import UserSubscribe, check_favorite_in_list
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from users.models import Subscriptions
 
 User = get_user_model()

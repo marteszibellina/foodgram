@@ -7,10 +7,9 @@ from django.db import models
 from recipes.constants import (COOKING_TIME_ERROR, INGREDIENT_AMOUNT_ERROR,
                                MAX_COOKING_TIME, MAX_INGRED_MEASURE_LENGTH,
                                MAX_INGRED_NAME_LENGTH, MAX_INGREDIENT_AMOUNT,
-                               MAX_RECIPE_NAME,
-                               MAX_TAG_NAME_LENGTH, MAX_TAG_SLUG_LENGTH,
-                               MIN_COOKING_TIME, MIN_INGREDIENT_AMOUNT,
-                               TEXT_SLICE)
+                               MAX_RECIPE_NAME, MAX_TAG_NAME_LENGTH,
+                               MAX_TAG_SLUG_LENGTH, MIN_COOKING_TIME,
+                               MIN_INGREDIENT_AMOUNT, TEXT_SLICE)
 
 User = get_user_model()
 

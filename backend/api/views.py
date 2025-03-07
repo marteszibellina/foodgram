@@ -3,10 +3,12 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, Count, OuterRef, Sum
+from django.db.models import Count, Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+
 from djoser.views import UserViewSet as UVS
+
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from rest_framework import exceptions, permissions, status, viewsets
@@ -15,14 +17,13 @@ from rest_framework.response import Response
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
-from api.permissions import (IsReadOnly, IsAdminOrCurrentUser,
-                             IsAuthorOrReadOnly)
+from api.permissions import (IsAdminOrCurrentUser, IsAuthorOrReadOnly,
+                             IsReadOnly)
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              RecipeCreateSerializer, RecipeShortSerializer,
-                             ShoppingCartSerializer,
-                             SubscribeCreateSerializer, TagSerializer,
-                             UserAvatarSerializer,
-                             UserViewSerializer, SubscribeViewSerializer)
+                             ShoppingCartSerializer, SubscribeCreateSerializer,
+                             SubscribeViewSerializer, TagSerializer,
+                             UserAvatarSerializer, UserViewSerializer)
 from api.utils import create_list_txt, create_short_link
 from users.models import Subscriptions
 
