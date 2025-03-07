@@ -103,7 +103,7 @@ class UserViewSet(UVS):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True,
-            methods=['post',],
+            methods=['post', ],
             url_path='subscribe',
             permission_classes=[permissions.IsAuthenticated],
             pagination_class=CustomPagination)
@@ -189,7 +189,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """Получение сериализатора."""
-        if self.request.method in ['post', 'update',]:
+        if self.request.method in ['post', 'update', ]:
             return RecipeCreateSerializer
         return self.serializer_class
 
