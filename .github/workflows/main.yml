@@ -4,7 +4,7 @@ name: Main Foodgram Workflow
 on:
     push:
         branches:
-            - main
+            - portesql-v.1.1
 
 jobs:
   tests:
