@@ -4,7 +4,7 @@ from foodgram_backend import settings
 from rest_framework.pagination import PageNumberPagination
 
 
-class CustomPagination(PageNumberPagination):
+class StandartPagination(PageNumberPagination):
     """Пагинация для списка пользователей и рецептов."""
 
     page_size = settings.REST_FRAMEWORK['PAGE_SIZE']

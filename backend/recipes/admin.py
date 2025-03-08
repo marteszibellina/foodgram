@@ -3,6 +3,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.db.models import Count
+
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 
@@ -50,7 +51,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     """Модель администрирования рецептов"""
 
-    list_display = ('pk', 'author', 'name', )
+    list_display = ('pk', 'author', 'name', 'favorites_count', )
     list_display_links = ('author',)
     search_fields = ('author', 'name',)
     list_filter = ('tags',)
@@ -62,6 +63,11 @@ class RecipeAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         return queryset.annotate(favorites_count=Count('favorite'))
 
+    @admin.display(
+        boolean=True,
+        ordering='favorites_count',
+        description='Добавлено в избранное',
+    )
     def favorites_count(self, obj):
         """Выводит общее число добавлений этого рецепта в избранное"""
         # Берём модель избраного и через queryset отбираем значение

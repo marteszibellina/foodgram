@@ -7,7 +7,7 @@ from django.db import models
 
 from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
                              LAST_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH)
-from users.validators import selfsubscribe
+# from users.validators import selfsubscribe
 
 
 class User(AbstractUser):
@@ -74,7 +74,7 @@ class Subscriptions(models.Model):
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор рецептов',
-        validators=[selfsubscribe],
+        # validators=[selfsubscribe],
     )
 
     class Meta:
@@ -86,6 +86,10 @@ class Subscriptions(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'author'],
                 name='unique_subscription'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('author')),
+                name='subscription_prevent_self_subscription'
             )
         ]
 

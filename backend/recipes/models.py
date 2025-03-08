@@ -3,12 +3,14 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from recipes.constants import (COOKING_TIME_ERROR, INGREDIENT_AMOUNT_ERROR,
                                MAX_COOKING_TIME, MAX_INGRED_MEASURE_LENGTH,
                                MAX_INGRED_NAME_LENGTH, MAX_INGREDIENT_AMOUNT,
                                MAX_RECIPE_NAME, MAX_TAG_NAME_LENGTH,
                                MAX_TAG_SLUG_LENGTH, MIN_COOKING_TIME,
                                MIN_INGREDIENT_AMOUNT, TEXT_SLICE)
+from recipes.querysets import RecipeQuerySet
 
 User = get_user_model()
 
@@ -24,7 +26,6 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(
         verbose_name='Единица измерения',
         max_length=MAX_INGRED_MEASURE_LENGTH,
-        blank=False,
     )
 
     class Meta:
@@ -51,13 +52,11 @@ class Tag(models.Model):
         verbose_name='Название тега',
         max_length=MAX_TAG_NAME_LENGTH,
         unique=True,
-        blank=False,
     )
     slug = models.SlugField(
         verbose_name='Slug тега',
         max_length=MAX_TAG_SLUG_LENGTH,
         unique=True,
-        blank=False,
     )
 
     class Meta:
@@ -111,6 +110,8 @@ class Recipe(models.Model):
         verbose_name='Дата публикации',
         auto_now_add=True,
     )
+
+    objects = RecipeQuerySet.as_manager()  # Добавляем кверисет
 
     class Meta:
         """Мета-класс модели"""
@@ -200,7 +201,7 @@ class BaseFavotireShoppingCart(models.Model):
                 # на случай, есди пользователь решит добавить один и тот же
                 # рецепт дважды
                 fields=('user', 'recipe'),
-                name='unique_user_recipe'
+                name='%(class)s_unique_user_recipe'
             )
         ]
 
@@ -208,7 +209,7 @@ class BaseFavotireShoppingCart(models.Model):
 class Favorite(BaseFavotireShoppingCart):
     """Модель избранного"""
 
-    class Meta:
+    class Meta(BaseFavotireShoppingCart.Meta):
         """Мета-класс модели"""
 
         verbose_name = 'Избранное'
@@ -222,7 +223,7 @@ class Favorite(BaseFavotireShoppingCart):
 class ShoppingCart(BaseFavotireShoppingCart):
     """Модель списка покупок"""
 
-    class Meta:
+    class Meta(BaseFavotireShoppingCart.Meta):
         """Мета-класс модели"""
 
         verbose_name = 'Список покупок'
