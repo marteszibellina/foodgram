@@ -6,11 +6,11 @@ from django.db import transaction
 from rest_framework import serializers, validators
 
 from api.fields import Base64ImageField
+from api.utils import check_favorite_in_list, UserSubscribe
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-from api.utils import UserSubscribe
-from users.models import Subscriptions
 
+from users.models import Subscriptions
 User = get_user_model()
 
 
@@ -97,10 +97,8 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
         """Мета-класс сериализатора."""
 
         model = RecipeIngredient
-        fields = (
-            'id',
-            'amount',
-        )
+        fields = ('id',
+                  'amount',)
 
 
 class RecipeViewSerializer(serializers.ModelSerializer):
@@ -111,8 +109,7 @@ class RecipeViewSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientViewSerializer(
         read_only=True,
         many=True,
-        source='recipe_ingredients',
-    )
+        source='recipe_ingredients')
     is_favorited = serializers.BooleanField(read_only=True, default=False)
     is_in_shopping_cart = serializers.BooleanField(
         read_only=True, default=False)
@@ -122,6 +119,16 @@ class RecipeViewSerializer(serializers.ModelSerializer):
 
         model = Recipe
         exclude = ('pub_date',)  # Всё, кроме даты публикации
+
+    def get_is_favorited(self, obj):
+        """Проверка на наличие в избранном."""
+        return check_favorite_in_list(self.context.get('request'),
+                                      obj, Favorite)
+
+    def get_is_in_shopping_cart(self, obj):
+        """Проверка на наличие в корзине."""
+        return check_favorite_in_list(self.context.get('request'),
+                                      obj, ShoppingCart)
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -175,8 +182,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         """
         Создание рецепта|Обновление рецепта.
         """
-        ingredients_id = [ingredient['id'] for ingredient in ingredients]
-        ingredients.clear()
         ingredient_list = [
             RecipeIngredient(
                 ingredient=ingredient['id'],
@@ -184,18 +189,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 amount=ingredient['amount'],
             )
             for ingredient in ingredients
-            if ingredient['id'] not in existing_ingredients
         ]
         if ingredient_list:
-            return RecipeIngredient.objects.bulk_create(ingredient_list)
-        return None
+            RecipeIngredient.objects.bulk_create(ingredient_list)
 
     @transaction.atomic
     def create(self, validated_data):
-        """
-        Создание нового рецепта.
-        Если на одном из этапов возникнет ошибка, то все операции отменятся.
-        """
+        """Создание нового рецепта."""
         user = self.context['request'].user
         validated_data['author'] = user
         ingredients = validated_data.pop('recipe_ingredients')
@@ -208,11 +208,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         """Обновление рецепта."""
-        tags = validated_data.pop('tags', None)
-        ingredients = validated_data.pop('recipe_ingredients', None)
-        if ingredients:
-            ingredients.clear()  # Очистка ингредиентов
-            self.recipe_create_update(instance, ingredients)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('recipe_ingredients')
+        instance.tags.set(tags)
+        instance.ingredients.clear()  # Очистка ингредиентов
+        self.recipe_create_update(instance, ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
