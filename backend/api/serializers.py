@@ -6,7 +6,7 @@ from django.db import transaction
 from rest_framework import serializers, validators
 
 from api.fields import Base64ImageField
-from api.utils import check_favorite_in_list, UserSubscribe
+from api.utils import UserSubscribe
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 

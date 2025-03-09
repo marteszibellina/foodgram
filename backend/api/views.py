@@ -103,10 +103,8 @@ class UserViewSet(UVS):
             pagination_class=StandartPagination)
     def subscribe(self, request, id):
         """Подписка на пользователя."""
-        recipes_limit = int(request.query_params.get('recipes_limit', 3))
         author = get_object_or_404(User, id=id)
         user = self.request.user
-        recipe = self.request.data.get('recipe')
         serializer = SubscribeCreateSerializer(
             context={'request': request},
             data={'author': author.id, 'user': user.id})
@@ -287,8 +285,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated],)
     def favorite(self, request, pk=None):
         """Добавление и удаление рецепта в избранное."""
-        instance =self.handle_add(FavoriteSerializer, Favorite,
-                                  request.user, pk)
+        instance = self.handle_add(FavoriteSerializer, Favorite,
+                                   request.user, pk)
         recipe_data = SubscribeRecipeSerializer(instance.recipe).data
         return Response(recipe_data, status=status.HTTP_201_CREATED)
 
