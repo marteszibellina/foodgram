@@ -193,21 +193,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Получение рецепта."""
         return get_object_or_404(Recipe, id=pk)
 
-    def handle_add(self, serializer_class, model, data):
+    def handle_add(self, serializer_class, model, user, pk):
         """Добавление рецепта: избранное, список покупок."""
-        # recipe = self.get_recipe(request, pk)
-        # data = {'user': request.user.id, 'recipe': recipe.id}
+        recipe = self.get_recipe(self.request, pk)
         serializer = serializer_class(
-            data=data,
+            data={'user': user.id, 'recipe': recipe.id},
             context={'request': self.request})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save(user=self.request.user)
         return instance
 
-    def handle_remove(self, serializer_class, model, data):
+    def handle_remove(self, serializer_class, model, user, pk):
         """Удаление рецепта: избранное, список покупок."""
+        recipe = self.get_recipe(self.request, pk)
         deleted_count, deleted = model.objects.filter(
-            recipe=data['recipe'], user=data['user']).delete()
+            recipe=recipe, user=user).delete()
         return deleted_count
 
     @action(methods=['post'],
@@ -217,16 +217,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
     def shopping_cart(self, request, pk=None):
         """Добавление и удаление рецепта в список покупок."""
-        recipe = self.get_recipe(request, pk)
         if ShoppingCart.objects.filter(
-                user=request.user, recipe=recipe).exists():
+                user=request.user, recipe_id=pk).exists():
             return Response(
                 {'detail': 'Рецепт уже в списке покупок.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        data = {'recipe': recipe.id, 'user': request.user.id}
         instance = self.handle_add(
-            ShoppingCartSerializer, ShoppingCart, data)
+            ShoppingCartSerializer, ShoppingCart, request.user, pk)
         recipe_serializer = RecipeViewSubscriptionSerializer(instance.recipe)
         return Response(recipe_serializer.data,
                         status=status.HTTP_201_CREATED)
@@ -234,11 +232,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk=None):
         """Удаление рецепта из списка покупок."""
-        recipe = self.get_recipe(request, pk)
-        user = request.user
-        data = {'recipe': recipe.id, 'user': user.id}
         deleted = self.handle_remove(
-            ShoppingCartSerializer, ShoppingCart, data)
+            ShoppingCartSerializer, ShoppingCart, request.user, pk)
         if deleted > 0:
             return Response(
                 {'detail': 'Рецепт удален из списка покупок.'},
@@ -285,21 +280,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             detail=True,
             url_path='favorite',
             permission_classes=[permissions.IsAuthenticated],)
-    def favorite(self, request, pk):
+    def favorite(self, request, pk=None):
         """Добавление и удаление рецепта в избранное."""
-        recipe = self.get_recipe(request, pk)
-        data = {'user': request.user.id, 'recipe': recipe.id}
-        self.handle_add(FavoriteSerializer, Favorite, data)
-        recipe_data = SubscribeRecipeSerializer(recipe).data
+        instance =self.handle_add(FavoriteSerializer, Favorite,
+                                  request.user, pk)
+        recipe_data = SubscribeRecipeSerializer(instance.recipe).data
         return Response(recipe_data, status=status.HTTP_201_CREATED)
 
     @favorite.mapping.delete
     def remove_from_favorite(self, request, pk=None):
         """Удаление рецепта из избранного."""
-        recipe = self.get_recipe(request, pk)
-        user = request.user
-        data = {'recipe': recipe.id, 'user': user.id}
-        removed = self.handle_remove(FavoriteSerializer, Favorite, data)
+        removed = self.handle_remove(FavoriteSerializer, Favorite,
+                                     request.user, pk)
         if removed > 0:
             return Response(
                 {'detail': 'Рецепт удален из избранного.'},
