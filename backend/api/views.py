@@ -6,9 +6,9 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+
 from djoser.views import UserViewSet as UVS
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,9 +22,10 @@ from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              SubscribeViewSerializer, TagSerializer,
                              RecipeViewSubscriptionSerializer,
                              UserAvatarSerializer, UserViewSerializer,
-                            #  RecipeViewSerializer,
                              )
 from api.utils import create_list_txt, create_short_link
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from users.models import Subscriptions
 
 User = get_user_model()
@@ -170,9 +171,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Получение списка рецептов."""
         queryset = Recipe.objects.all()
-        if not self.request.user.is_anonymous:
-            queryset = queryset.with_favorites_and_shopping_cart(
-                self.request.user)
+        if self.request.user.is_anonymous:
+            return queryset
             # queryset = queryset.annotate(
             #     is_favorited=Exists(Favorite.objects.filter(
             #         user=self.request.user, recipe_id=OuterRef('pk')
@@ -181,7 +181,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             #         user=self.request.user, recipe_id=OuterRef('pk')
             #     ))
             # )
-        return queryset
+        return queryset.with_favorites_and_shopping_cart(self.request.user)
 
     def get_permissions(self):
         """Получение прав."""

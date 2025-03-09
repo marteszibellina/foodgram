@@ -13,9 +13,11 @@ class RecipeFilter(filters.FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),)
     is_in_shopping_cart = filters.BooleanFilter(
-        field_name='is_in_shopping_cart')
+        method='filter_is_in_shopping_cart',  # Лишнее
+        label='В списке покупок')
     is_favorited = filters.BooleanFilter(
-        field_name='is_favorited')
+        method='filter_is_favorited',  # Лишнее
+        label='В избранном')
 
     class Meta:
         """Мета-класс фильтра"""
