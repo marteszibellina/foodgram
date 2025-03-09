@@ -120,16 +120,6 @@ class RecipeViewSerializer(serializers.ModelSerializer):
         model = Recipe
         exclude = ('pub_date',)  # Всё, кроме даты публикации
 
-    def get_is_favorited(self, obj):
-        """Проверка на наличие в избранном."""
-        return check_favorite_in_list(self.context.get('request'),
-                                      obj, Favorite)
-
-    def get_is_in_shopping_cart(self, obj):
-        """Проверка на наличие в корзине."""
-        return check_favorite_in_list(self.context.get('request'),
-                                      obj, ShoppingCart)
-
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания/обновления рецепта."""
@@ -278,8 +268,7 @@ class SubscribeViewSerializer(serializers.ModelSerializer):
         return RecipeViewSubscriptionSerializer(
             Recipe.objects.filter(author=obj)[:recipes_limit],
             many=True,
-            context={'request': self.context['request']}
-        ).data
+            context={'request': request}).data
 
     def get_recipes_count(self, obj):
         """Получение количества рецептов."""

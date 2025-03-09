@@ -98,7 +98,6 @@ slug: breakfast
 - `api/recipes/{recipes_id}/cart` (GET, POST): добавить, удалить или получить список всех рецептов в корзине.
 - `api/recipes/download_shopping_cart` (GET): получить список ингредиентов в формате .txt.
 
-## Дипломный проект подготовил:
+## Дипломный проект подготовил: [Дмитрий Соболев](https://github.com/marteszibellina)
 
-<h3 align="center"><a href="https://github.com/marteszibellina" target="_blank">Дмитрий Соболев</a> 
-</h3>
+## Рабочая версия [Foodgram](https://valerababahov.onthewifi.com/recipes)
