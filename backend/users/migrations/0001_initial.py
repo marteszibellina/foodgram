@@ -8,8 +8,6 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import users.validators
-
 
 class Migration(migrations.Migration):
 
@@ -50,7 +48,7 @@ class Migration(migrations.Migration):
             name='Subscriptions',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='following', to=settings.AUTH_USER_MODEL, validators=[users.validators.selfsubscribe], verbose_name='Автор рецептов')),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='following', to=settings.AUTH_USER_MODEL, verbose_name='Автор рецептов')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='follower', to=settings.AUTH_USER_MODEL, verbose_name='Подписчик')),
             ],
             options={

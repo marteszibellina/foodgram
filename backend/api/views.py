@@ -158,28 +158,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all()
 
         # Если пользователь авторизован, добавляем аннотации
-        if not self.request.user.is_anonymous:
+        if self.request.user.is_authenticated:
             queryset = queryset.with_favorites_and_shopping_cart(
                 self.request.user)
-        else:
-            # Для неавторизованных пользователей добавляем аннотации с False
-            queryset = queryset.annotate(
-                is_favorited=Value(False, output_field=BooleanField()),
-                is_in_shopping_cart=Value(False, output_field=BooleanField())
-            )
-
-        # Получаем фильтры из запроса
-        filters = self.request.query_params
-
-        # Фильтруем по аннотированным полям, если переданы параметры
-        if 'is_favorited' in filters:
-            is_favorited = filters.get('is_favorited')
-            queryset = queryset.filter(is_favorited=bool(int(is_favorited)))
-
-        if 'is_in_shopping_cart' in filters:
-            is_in_shopping_cart = filters.get('is_in_shopping_cart')
-            queryset = queryset.filter(is_in_shopping_cart=bool(int(
-                is_in_shopping_cart)))
 
         return queryset
 
