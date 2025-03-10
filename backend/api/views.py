@@ -252,7 +252,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Удаление рецепта из списка покупок."""
 
         return self.handle_remove(ShoppingCartSerializer, ShoppingCart,
-                        request.user, pk)
+                                  request.user, pk)
 
     @action(methods=['get'],
             detail=False,

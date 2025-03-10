@@ -9,7 +9,6 @@ from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
                              LAST_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH)
 
 
-
 class User(AbstractUser):
     """Модель пользователя."""
 
