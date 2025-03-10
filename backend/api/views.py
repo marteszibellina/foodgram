@@ -3,7 +3,7 @@
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Sum, Value, BooleanField
+from django.db.models import Count, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet as UVS
