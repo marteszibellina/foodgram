@@ -7,7 +7,7 @@ from django.db import models
 
 from users.constants import (EMAIL_MAX_LENGTH, FIRST_NAME_MAX_LENGTH,
                              LAST_NAME_MAX_LENGTH, USERNAME_MAX_LENGTH)
-# from users.validators import selfsubscribe
+
 
 
 class User(AbstractUser):
@@ -29,13 +29,11 @@ class User(AbstractUser):
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=FIRST_NAME_MAX_LENGTH,
-        blank=False,
         help_text='Укажите Ваше имя'
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         max_length=LAST_NAME_MAX_LENGTH,
-        blank=False,
         help_text='Укажите Вашу фамилию'
     )
     avatar = models.ImageField(
@@ -74,7 +72,6 @@ class Subscriptions(models.Model):
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор рецептов',
-        # validators=[selfsubscribe],
     )
 
     class Meta:

@@ -2,15 +2,14 @@
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-
 from rest_framework import serializers, validators
 
 from api.fields import Base64ImageField
 from api.utils import UserSubscribe
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-
 from users.models import Subscriptions
+
 User = get_user_model()
 
 
@@ -180,8 +179,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
             for ingredient in ingredients
         ]
-        if ingredient_list:
-            RecipeIngredient.objects.bulk_create(ingredient_list)
+        RecipeIngredient.objects.bulk_create(ingredient_list)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -218,16 +216,6 @@ class RecipeViewSubscriptionSerializer(serializers.ModelSerializer):
 
         model = Recipe
         fields = ('id', 'name', 'cooking_time', 'image')
-
-
-class SubscribeRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор рецепта для подписки."""
-
-    class Meta:
-        """Мета-класс сериализатора."""
-
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscribeViewSerializer(serializers.ModelSerializer):
@@ -287,14 +275,13 @@ class SubscribeCreateSerializer(serializers.ModelSerializer):
             validators.UniqueTogetherValidator(
                 queryset=Subscriptions.objects.all(),
                 fields=('user', 'author'),
-                message='Вы уже подписаны на этого автора.'
-            )
+                message='Вы уже подписаны на этого автора.'),
         ]
 
     def validate(self, data):
         """Валидация для создания подписки."""
-        user = self.context.get('request').user
-        author = data.get('author')
+        user = self.context.get('request').user  # Можно достать из data
+        author = data.get('author')  # Можно достать из data
 
         if user == author:
             raise serializers.ValidationError(
@@ -315,12 +302,12 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         """Мета-класс сериализатора."""
 
         model = ShoppingCart
-        fields = ('user',
-                  'recipe',)
-        constriants = validators.UniqueTogetherValidator(
-            queryset=ShoppingCart.objects.all(),
-            fields=('user', 'recipe'),
-            message='Рецепт уже в списке покупок.')
+        fields = ('user', 'recipe',)
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже в списке покупок.')]
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -330,21 +317,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         """Мета-класс сериализатора."""
 
         model = Favorite
-        fields = ('user',
-                  'recipe')
-        constriants = validators.UniqueTogetherValidator(
-            queryset=Favorite.objects.all(),
-            fields=('user', 'recipe'),
-            message='Рецепт уже в избранном.')
-
-    def validate(self, data):
-        """Проверка на наличие рецепта в избранном."""
-        user = data['user']
-        recipe = data['recipe']
-
-        # Проверка, если уже есть запись в избранном
-        if Favorite.objects.filter(user=user, recipe=recipe).exists():
-            raise serializers.ValidationError(
-                {'detail': 'Рецепт уже в избранном.'})
-
-        return data
+        fields = ('user', 'recipe')
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже в избранном.')]

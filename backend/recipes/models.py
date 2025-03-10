@@ -3,6 +3,7 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import QuerySet, Exists, OuterRef
 
 from recipes.constants import (COOKING_TIME_ERROR, INGREDIENT_AMOUNT_ERROR,
                                MAX_COOKING_TIME, MAX_INGRED_MEASURE_LENGTH,
@@ -10,7 +11,6 @@ from recipes.constants import (COOKING_TIME_ERROR, INGREDIENT_AMOUNT_ERROR,
                                MAX_RECIPE_NAME, MAX_TAG_NAME_LENGTH,
                                MAX_TAG_SLUG_LENGTH, MIN_COOKING_TIME,
                                MIN_INGREDIENT_AMOUNT, TEXT_SLICE)
-from recipes.querysets import RecipeQuerySet
 
 User = get_user_model()
 
@@ -68,6 +68,22 @@ class Tag(models.Model):
     def __str__(self):
         """Возвращает название тега."""
         return self.name[:TEXT_SLICE]
+
+
+class RecipeQuerySet(QuerySet):
+    """Кверисет для получения списка рецептов."""
+
+    def with_favorites_and_shopping_cart(self, user):
+        """Добавление полей в кверисет."""
+
+        return self.annotate(
+            is_favorited=Exists(Favorite.objects.filter(
+                user=user, recipe_id=OuterRef('pk')
+            )),
+            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
+                user=user, recipe_id=OuterRef('pk')
+            ))
+        )
 
 
 class Recipe(models.Model):

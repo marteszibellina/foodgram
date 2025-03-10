@@ -8,14 +8,6 @@ from rest_framework import serializers
 from users.models import Subscriptions
 
 
-def check_favorite_in_list(request, obj, model):
-    """Проверка на наличие в избранном."""
-    if not request:
-        return False
-    return (request.user.is_authenticated and model.objects.filter(
-        user=request.user, recipe__id=obj.id).exists())
-
-
 def create_list_txt(shopping_list, text):
     """Создание списка покупок в формате txt."""
     # Получаем текущую дату

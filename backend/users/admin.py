@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class FoodGramUserAdmin(UserAdmin):
     """Модель администрирования пользователя"""
 
     list_display = ('pk',
