@@ -280,8 +280,8 @@ class SubscribeCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Валидация для создания подписки."""
-        user = self.context.get('request').user  # Можно достать из data
-        author = data.get('author')  # Можно достать из data
+        user = data.get('user')
+        author = data.get('author')
 
         if user == author:
             raise serializers.ValidationError(
